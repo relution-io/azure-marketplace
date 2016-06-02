@@ -2,8 +2,6 @@
   "$schema": "http: //schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-   
-
     "adminUsername": {
       "type": "string",
       "defaultValue": "remoteUser"
@@ -11,35 +9,27 @@
     "adminPassword": {
       "type": "securestring",
       "defaultValue": "Start1234!"
-    } 
-	,
-	"sqlserverlogin": {
+    },
+    "sqlserverlogin": {
       "type": "string",
       "defaultValue": "sqluser"
-    }, 
-	"sqlserverpassword": {
+    },
+    "sqlserverpassword": {
       "type": "securestring",
       "defaultValue": "Start1234!"
-    } 
+    }
   },
   "variables": {
-  
-    
     "resourceGroupNameToLower": "[toLower(resourceGroup().name)]",
-    "sqlservername" : "[concat(variables('resourceGroupNameToLower'), '-sql')]", 
-  
-	"apiVersion": "2015-06-15", 
-	
-	"OSDiskStorageAccountType": "Standard_LRS",
-     
-     
-	"virtualNetworkName": "[concat(variables('resourceGroupNameToLower'),'vnet')]",
-	"location": "[resourceGroup().location]",
+    "sqlservername": "[concat(variables('resourceGroupNameToLower'), '-sql')]",
+    "apiVersion": "2015-06-15",
+    "OSDiskStorageAccountType": "Standard_LRS",
+    "virtualNetworkName": "[concat(variables('resourceGroupNameToLower'),'vnet')]",
+    "location": "[resourceGroup().location]",
     "uniqueNamePrefix": "[concat(variables('resourceGroupNameToLower'))]",
     "appserversubnetname": "appserver",
     "newAppServerSubnetAddressPrefix": "[concat('192.168.1.32/27')]",
     "appNSGName": "[concat(variables('uniqueNamePrefix'),'-app-nsg')]",
-
     "newStorageAccountSuffix": "[concat('vmss', variables('uniqueNamePrefix'))]",
     "storageAccountPrefix": [
       "a",
@@ -48,7 +38,6 @@
       "s",
       "y"
     ],
-
     "wadProcessorMetricName": "\\Processor(_Total)\\% Processor Time",
     "subnetnameapplicationserver": "appserver",
     "loadBalancerNameapplicationserver": "[concat(variables('uniqueNamePrefix'),'LoadBalancer-applicationserver')]",
@@ -60,447 +49,390 @@
     "nicIdapplicationserver": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicNameapplicationserver'))]",
     "frontEndIPConfigIDapplicationserver": "[concat(variables('lbIDapplicationserver'),'/frontendIPConfigurations/loadBalancerFrontEnd')]",
     "loadbalancerBackendpoolIdapplicationserver": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/',variables('resourceGroupNameToLower'), '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerNameapplicationserver'), '/backendAddressPools/bepool1')]"
-
   },
-  "resources": [
-    {
-      "apiVersion": "[variables('apiVersion')]",
-      "type": "Microsoft.Network/virtualNetworks",
-      "name": "[variables('virtualNetworkName')]",
-      "location": "West Europe",
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "192.168.0.0/16"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "shared",
-            "properties": {
-              "addressPrefix": "192.168.0.1/24"
-            }
-          }
+  "resources": [{
+    "apiVersion": "[variables('apiVersion')]",
+    "type": "Microsoft.Network/virtualNetworks",
+    "name": "[variables('virtualNetworkName')]",
+    "location": "West Europe",
+    "properties": {
+      "addressSpace": {
+        "addressPrefixes": [
+          "192.168.0.0/16"
         ]
-      }
-    },
-    {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[variables('appNSGName')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
       },
-      "properties": {
-        "securityRules": [
-          {
-            "name": "http-rule",
-            "properties": {
-              "description": "Allow HTTP",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "80",
-              "sourceAddressPrefix": "Internet",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 100,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "https-rule",
-            "properties": {
-              "description": "Allow HTTPS",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "443",
-              "sourceAddressPrefix": "Internet",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 200,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "ssh-rule",
-            "properties": {
-              "description": "Allow WEB",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "22",
-              "sourceAddressPrefix": "Internet",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 101,
-              "direction": "Inbound"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/virtualNetworks/subnets",
-      "apiVersion": "2015-06-15",
-      "name": "[concat(variables('virtualNetworkName'), '/', variables('appserversubnetname'))]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "addressPrefix": "[variables('newAppServerSubnetAddressPrefix')]",
-        "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('appNSGName'))]"
+      "subnets": [{
+        "name": "shared",
+        "properties": {
+          "addressPrefix": "192.168.0.1/24"
         }
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('appNSGName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[concat(variables('storageAccountPrefix')[copyIndex()], variables('newStorageAccountSuffix'))]",
-      "apiVersion": "2015-05-01-preview",
-      "copy": {
-        "name": "storageLoop",
-        "count": 5
-      },
-      "location": "[variables('location')]",
-      "properties": {
-        "accountType": "[variables('OSDiskStorageAccountType')]"
+      }]
+    }
+  }, {
+    "apiVersion": "2015-06-15",
+    "type": "Microsoft.Network/networkSecurityGroups",
+    "name": "[variables('appNSGName')]",
+    "location": "[resourceGroup().location]",
+    "tags": {},
+    "properties": {
+      "securityRules": [{
+        "name": "http-rule",
+        "properties": {
+          "description": "Allow HTTP",
+          "protocol": "Tcp",
+          "sourcePortRange": "*",
+          "destinationPortRange": "80",
+          "sourceAddressPrefix": "Internet",
+          "destinationAddressPrefix": "*",
+          "access": "Allow",
+          "priority": 100,
+          "direction": "Inbound"
+        }
+      }, {
+        "name": "https-rule",
+        "properties": {
+          "description": "Allow HTTPS",
+          "protocol": "Tcp",
+          "sourcePortRange": "*",
+          "destinationPortRange": "443",
+          "sourceAddressPrefix": "Internet",
+          "destinationAddressPrefix": "*",
+          "access": "Allow",
+          "priority": 200,
+          "direction": "Inbound"
+        }
+      }, {
+        "name": "ssh-rule",
+        "properties": {
+          "description": "Allow WEB",
+          "protocol": "Tcp",
+          "sourcePortRange": "*",
+          "destinationPortRange": "22",
+          "sourceAddressPrefix": "Internet",
+          "destinationAddressPrefix": "*",
+          "access": "Allow",
+          "priority": 101,
+          "direction": "Inbound"
+        }
+      }]
+    }
+  }, {
+    "type": "Microsoft.Network/virtualNetworks/subnets",
+    "apiVersion": "2015-06-15",
+    "name": "[concat(variables('virtualNetworkName'), '/', variables('appserversubnetname'))]",
+    "location": "[resourceGroup().location]",
+    "properties": {
+      "addressPrefix": "[variables('newAppServerSubnetAddressPrefix')]",
+      "networkSecurityGroup": {
+        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('appNSGName'))]"
       }
     },
-    {
+    "dependsOn": [
+      "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+      "[concat('Microsoft.Network/networkSecurityGroups/', variables('appNSGName'))]"
+    ]
+  }, {
+    "type": "Microsoft.Storage/storageAccounts",
+    "name": "[concat(variables('storageAccountPrefix')[copyIndex()], variables('newStorageAccountSuffix'))]",
+    "apiVersion": "2015-05-01-preview",
+    "copy": {
+      "name": "storageLoop",
+      "count": 5
+    },
+    "location": "[variables('location')]",
+    "properties": {
+      "accountType": "[variables('OSDiskStorageAccountType')]"
+    }
+  }, {
+    "name": "autoscalewad-applicationserver",
+    "type": "Microsoft.Insights/autoscaleSettings",
+    "location": "[variables('location')]",
+    "apiVersion": "2014-04-01",
+    "dependsOn": [
+      "[concat('Microsoft.Compute/virtualMachineScaleSets/', variables('uniqueNamePrefix'),'-applicationserver')]"
+    ],
+    "tags": {
+      "displayName": "AutoScaleVMSS AutoScale"
+    },
+    "properties": {
       "name": "autoscalewad-applicationserver",
-      "type": "Microsoft.Insights/autoscaleSettings",
-      "location": "[variables('location')]",
-      "apiVersion": "2014-04-01",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachineScaleSets/', variables('uniqueNamePrefix'),'-applicationserver')]"
-      ],
-      "tags": {
-        "displayName": "AutoScaleVMSS AutoScale"
-      },
-      "properties": {
-        "name": "autoscalewad-applicationserver",
-        "targetResourceUri": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('resourceGroupNameToLower'), '/providers/Microsoft.Compute/virtualMachineScaleSets/', variables('uniqueNamePrefix'),'-applicationserver')]",
-        "enabled": true,
-        "profiles": [
-          {
-            "name": "Profile1",
-            "capacity": {
-              "minimum": "1",
-              "maximum": "1",
-              "default": "1"
-            },
-            "rules": [
-              {
-                "metricTrigger": {
-                  "metricName": "[variables('wadProcessorMetricName')]",
-                  "metricNamespace": "",
-                  "metricResourceUri": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('resourceGroupNameToLower'), '/providers/Microsoft.Compute/virtualMachineScaleSets/', variables('uniqueNamePrefix'),'-applicationserver')]",
-                  "timeGrain": "PT1M",
-                  "statistic": "Average",
-                  "timeWindow": "PT5M",
-                  "timeAggregation": "Average",
-                  "operator": "GreaterThan",
-                  "threshold": 800
-                },
-                "scaleAction": {
-                  "direction": "Increase",
-                  "type": "ChangeCount",
-                  "value": "1",
-                  "cooldown": "PT5M"
-                }
-              },
-              {
-                "metricTrigger": {
-                  "metricName": "[variables('wadProcessorMetricName')]",
-                  "metricNamespace": "",
-                  "metricResourceUri": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('resourceGroupNameToLower'), '/providers/Microsoft.Compute/virtualMachineScaleSets/', variables('uniqueNamePrefix'),'-applicationserver')]",
-                  "timeGrain": "PT1M",
-                  "statistic": "Average",
-                  "timeWindow": "PT5M",
-                  "timeAggregation": "Average",
-                  "operator": "LessThan",
-                  "threshold": 600
-                },
-                "scaleAction": {
-                  "direction": "Decrease",
-                  "type": "ChangeCount",
-                  "value": "1",
-                  "cooldown": "PT1M"
-                }
-              }
-            ]
-          }
-        ]
-      }
-    },
-
-    {
-      "apiVersion": "2015-05-01-preview",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat(variables('publicIPAddressNameapplicationserver'))]",
-      "location": "[variables('location')]",
-      "properties": {
-        "publicIPAllocationMethod": "static",
-        "dnsSettings": {
-          "domainNameLabel": "[toLower(variables('uniqueNamePrefix'))]"
-        }
-      }
-    },
-
-    {
-      "apiVersion": "2015-05-01-preview",
-      "name": "[variables('loadBalancerNameapplicationserver')]",
-      "type": "Microsoft.Network/loadBalancers",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressNameapplicationserver'))]"
-      ],
-      "properties": {
-
-        "frontendIPConfigurations": [
-          {
-            "name": "loadBalancerFrontEnd",
-            "properties": {
-              "publicIPAddress": {
-                "id": "[variables('publicIPAddressIDapplicationserver')]"
-              }
-            }
-          }
-        ],
-        "backendAddressPools": [
-          {
-            "name": "bepool1"
-          }
-        ],
-        "inboundNatPools": [
-          {
-            "name": "natpool1",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('frontEndIPConfigIDapplicationserver')]"
-              },
-              "protocol": "tcp",
-              "frontendPortRangeStart": 40000,
-              "frontendPortRangeEnd": 40999,
-              "backendPort": 22
-            }
-          }
-        ],
-        "loadBalancingRules": [
-
-          {
-            "name": "LBRule1",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('frontEndIPConfigIDapplicationserver')]"
-              },
-              "backendAddressPool": {
-                "id": "[variables('loadbalancerBackendpoolIdapplicationserver')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 80,
-              "backendPort": 80,
-              "enableFloatingIP": false,
-              "idleTimeoutInMinutes": 5,
-              "probe": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers/',variables('loadBalancerNameapplicationserver')),'/probes/tcpProbe1')]"
-              }
-            }
-          },
-
-          {
-            "name": "LBRule2",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('frontEndIPConfigIDapplicationserver')]"
-              },
-              "backendAddressPool": {
-                "id": "[variables('loadbalancerBackendpoolIdapplicationserver')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 443,
-              "backendPort": 443,
-              "enableFloatingIP": false,
-              "idleTimeoutInMinutes": 5,
-              "probe": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers/',variables('loadBalancerNameapplicationserver')),'/probes/tcpProbe2')]"
-              }
-            }
-          }
-
-        ],
-        "probes": [
-
-          {
-            "name": "tcpProbe1",
-            "properties": {
-              "protocol": "tcp",
-              "port": 80,
-              "intervalInSeconds": "5",
-              "numberOfProbes": "2"
-            }
-          },
-
-          {
-            "name": "tcpProbe2",
-            "properties": {
-              "protocol": "tcp",
-              "port": 443,
-              "intervalInSeconds": "5",
-              "numberOfProbes": "2"
-            }
-          }
-
-        ]
-
-
-      }
-    },
-	{
-		"type": "Microsoft.Sql/servers",
-		"kind": "v12.0",
-		"name": "[variables('sqlservername')]",
-		"apiVersion": "2014-04-01-preview",
-		"location": "[variables('location')]",
-		"properties": {
-			"administratorLogin": "[parameters('sqlserverlogin')]",
-			"administratorLoginPassword": "[parameters('sqlserverpassword')]",
-			"version": "12.0"
-		},
-		"dependsOn": [],
-		"resources": 
-		[
-			{
-				"type": "databases",
-				"name": "relution",
-				"apiVersion": "2014-04-01-preview",
-				"location": "[variables('location')]",
-				"properties": {
-					"edition": "Basic",
-					"collation": "SQL_Latin1_General_CP1_CI_AS",
-					"maxSizeBytes": "1073741824",
-					"requestedServiceObjectiveName": "Basic"            
-				},
-				"dependsOn": [
-					"[resourceId('Microsoft.Sql/servers', variables('sqlservername'))]"
-				]
-			},
-			{
-				"type": "firewallRules",
-				"kind": "v12.0",
-				"name": "AllowAllWindowsAzureIps",
-				"apiVersion": "2014-04-01-preview",
-				"location": "[variables('location')]",
-				"properties": {
-					"startIpAddress": "0.0.0.0",
-					"endIpAddress": "0.0.0.0"
-				},
-				"dependsOn": [
-					"[resourceId('Microsoft.Sql/servers', variables('sqlservername'))]"
-				]
-			}
-		]
-	},
-	
-    {
-      "type": "Microsoft.Compute/virtualMachineScaleSets",
-      "apiVersion": "2015-06-15",
-      "name": "[concat(variables('uniqueNamePrefix'),'-applicationserver')]",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/a', variables('newStorageAccountSuffix'))]",
-        "[concat('Microsoft.Storage/storageAccounts/g', variables('newStorageAccountSuffix'))]",
-        "[concat('Microsoft.Storage/storageAccounts/m', variables('newStorageAccountSuffix'))]",
-        "[concat('Microsoft.Storage/storageAccounts/s', variables('newStorageAccountSuffix'))]",
-        "[concat('Microsoft.Storage/storageAccounts/y', variables('newStorageAccountSuffix'))]",
-        "[concat('Microsoft.Network/loadBalancers/',variables('loadBalancerNameapplicationserver'))]"
-      ],
-      "sku": {
-        "name": "Standard_A1",
-        "tier": "Standard",
-        "capacity": "2"
-      },
-      "properties": {
-        "upgradePolicy": {
-          "mode": "Automatic"
+      "targetResourceUri": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('resourceGroupNameToLower'), '/providers/Microsoft.Compute/virtualMachineScaleSets/', variables('uniqueNamePrefix'),'-applicationserver')]",
+      "enabled": true,
+      "profiles": [{
+        "name": "Profile1",
+        "capacity": {
+          "minimum": "1",
+          "maximum": "1",
+          "default": "1"
         },
-        "virtualMachineProfile": {
-
-          "storageProfile": {
-            "osDisk": {
-              "vhdContainers": [
-                "[concat('https://a', variables('newStorageAccountSuffix'), '.blob.core.windows.net/vmss')]",
-                "[concat('https://g', variables('newStorageAccountSuffix'), '.blob.core.windows.net/vmss')]",
-                "[concat('https://m', variables('newStorageAccountSuffix'), '.blob.core.windows.net/vmss')]",
-                "[concat('https://s', variables('newStorageAccountSuffix'), '.blob.core.windows.net/vmss')]",
-                "[concat('https://y', variables('newStorageAccountSuffix'), '.blob.core.windows.net/vmss')]"
-              ],
-              "name": "vmssosdisk",
-              "caching": "ReadOnly",
-              "createOption": "FromImage"
-            },
-            "imageReference": {
-              "publisher": "OpenLogic",
-              "offer": "CentOS",
-              "sku": "7.2",
-              "version": "latest"
-            }
+        "rules": [{
+          "metricTrigger": {
+            "metricName": "[variables('wadProcessorMetricName')]",
+            "metricNamespace": "",
+            "metricResourceUri": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('resourceGroupNameToLower'), '/providers/Microsoft.Compute/virtualMachineScaleSets/', variables('uniqueNamePrefix'),'-applicationserver')]",
+            "timeGrain": "PT1M",
+            "statistic": "Average",
+            "timeWindow": "PT5M",
+            "timeAggregation": "Average",
+            "operator": "GreaterThan",
+            "threshold": 800
           },
-          "osProfile": {
-            "computerNamePrefix": "[concat(variables('uniqueNamePrefix'),'-applicationserver')]",
-            "adminUsername": "[parameters('adminUsername')]",
-            "adminPassword": "[parameters('adminPassword')]"
-          },
-          "networkProfile": {
-            "networkInterfaceConfigurations": [
-              {
-                "name": "nic1",
-                "properties": {
-                  "primary": true,
-                  "ipConfigurations": [
-                    {
-                      "name": "ip1",
-                      "properties": {
-                        "subnet": {
-                          "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', variables('resourceGroupNameToLower'), '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetnameapplicationserver'))]"
-                        },
-                        "loadBalancerBackendAddressPools": [
-                          { "id": "[variables('loadbalancerBackendpoolIdapplicationserver')]" }
-                        ],
-                        "loadBalancerInboundNatPools": [
-                          { "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/',variables('resourceGroupNameToLower'), '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerNameapplicationserver'), '/inboundNatPools/natpool1')]" }
-                        ]
-
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          "extensionProfile": {
-            "extensions": [
-              {
-                "name": "CustomScriptExtensionVMSS",
-                "properties": {
-                  "publisher": "Microsoft.OSTCExtensions",
-                  "type": "CustomScriptForLinux",
-                  "typeHandlerVersion": "1.4",
-                  "autoUpgradeMinorVersion": true,
-                  "settings": {
-                    "fileUris": [ 
-					
-					"https://raw.githubusercontent.com/relution-io/azure-marketplace/master/script.sh" ],
-                    "commandToExecute": "[concat('sh script.sh --orga_name test --db_type mssql --db_host ',variables('sqlservername'),'.database.windows.net --db_port 1433 --db_name relution --db_user ',parameters('sqlserverlogin'),' --db_password ',parameters('sqlserverpassword'))]"
-                  }
-                }
-              }
-            ]
+          "scaleAction": {
+            "direction": "Increase",
+            "type": "ChangeCount",
+            "value": "1",
+            "cooldown": "PT5M"
           }
+        }, {
+          "metricTrigger": {
+            "metricName": "[variables('wadProcessorMetricName')]",
+            "metricNamespace": "",
+            "metricResourceUri": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('resourceGroupNameToLower'), '/providers/Microsoft.Compute/virtualMachineScaleSets/', variables('uniqueNamePrefix'),'-applicationserver')]",
+            "timeGrain": "PT1M",
+            "statistic": "Average",
+            "timeWindow": "PT5M",
+            "timeAggregation": "Average",
+            "operator": "LessThan",
+            "threshold": 600
+          },
+          "scaleAction": {
+            "direction": "Decrease",
+            "type": "ChangeCount",
+            "value": "1",
+            "cooldown": "PT1M"
+          }
+        }]
+      }]
+    }
+  }, {
+    "apiVersion": "2015-05-01-preview",
+    "type": "Microsoft.Network/publicIPAddresses",
+    "name": "[concat(variables('publicIPAddressNameapplicationserver'))]",
+    "location": "[variables('location')]",
+    "properties": {
+      "publicIPAllocationMethod": "static",
+      "dnsSettings": {
+        "domainNameLabel": "[toLower(variables('uniqueNamePrefix'))]"
+      }
+    }
+  }, {
+    "apiVersion": "2015-05-01-preview",
+    "name": "[variables('loadBalancerNameapplicationserver')]",
+    "type": "Microsoft.Network/loadBalancers",
+    "location": "[variables('location')]",
+    "dependsOn": [
+      "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressNameapplicationserver'))]"
+    ],
+    "properties": {
+
+      "frontendIPConfigurations": [{
+        "name": "loadBalancerFrontEnd",
+        "properties": {
+          "publicIPAddress": {
+            "id": "[variables('publicIPAddressIDapplicationserver')]"
+          }
+        }
+      }],
+      "backendAddressPools": [{
+        "name": "bepool1"
+      }],
+      "inboundNatPools": [{
+        "name": "natpool1",
+        "properties": {
+          "frontendIPConfiguration": {
+            "id": "[variables('frontEndIPConfigIDapplicationserver')]"
+          },
+          "protocol": "tcp",
+          "frontendPortRangeStart": 40000,
+          "frontendPortRangeEnd": 40999,
+          "backendPort": 22
+        }
+      }],
+      "loadBalancingRules": [{
+        "name": "LBRule1",
+        "properties": {
+          "frontendIPConfiguration": {
+            "id": "[variables('frontEndIPConfigIDapplicationserver')]"
+          },
+          "backendAddressPool": {
+            "id": "[variables('loadbalancerBackendpoolIdapplicationserver')]"
+          },
+          "protocol": "tcp",
+          "frontendPort": 80,
+          "backendPort": 80,
+          "enableFloatingIP": false,
+          "idleTimeoutInMinutes": 5,
+          "probe": {
+            "id": "[concat(resourceId('Microsoft.Network/loadBalancers/',variables('loadBalancerNameapplicationserver')),'/probes/tcpProbe1')]"
+          }
+        }
+      }, {
+        "name": "LBRule2",
+        "properties": {
+          "frontendIPConfiguration": {
+            "id": "[variables('frontEndIPConfigIDapplicationserver')]"
+          },
+          "backendAddressPool": {
+            "id": "[variables('loadbalancerBackendpoolIdapplicationserver')]"
+          },
+          "protocol": "tcp",
+          "frontendPort": 443,
+          "backendPort": 443,
+          "enableFloatingIP": false,
+          "idleTimeoutInMinutes": 5,
+          "probe": {
+            "id": "[concat(resourceId('Microsoft.Network/loadBalancers/',variables('loadBalancerNameapplicationserver')),'/probes/tcpProbe2')]"
+          }
+        }
+      }],
+      "probes": [{
+        "name": "tcpProbe1",
+        "properties": {
+          "protocol": "tcp",
+          "port": 80,
+          "intervalInSeconds": "5",
+          "numberOfProbes": "2"
+        }
+      }, {
+        "name": "tcpProbe2",
+        "properties": {
+          "protocol": "tcp",
+          "port": 443,
+          "intervalInSeconds": "5",
+          "numberOfProbes": "2"
+        }
+      }]
+    }
+  }, {
+    "type": "Microsoft.Sql/servers",
+    "kind": "v12.0",
+    "name": "[variables('sqlservername')]",
+    "apiVersion": "2014-04-01-preview",
+    "location": "[variables('location')]",
+    "properties": {
+      "administratorLogin": "[parameters('sqlserverlogin')]",
+      "administratorLoginPassword": "[parameters('sqlserverpassword')]",
+      "version": "12.0"
+    },
+    "dependsOn": [],
+    "resources": [{
+      "type": "databases",
+      "name": "relution",
+      "apiVersion": "2014-04-01-preview",
+      "location": "[variables('location')]",
+      "properties": {
+        "edition": "Basic",
+        "collation": "SQL_Latin1_General_CP1_CI_AS",
+        "maxSizeBytes": "1073741824",
+        "requestedServiceObjectiveName": "Basic"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlservername'))]"
+      ]
+    }, {
+      "type": "firewallRules",
+      "kind": "v12.0",
+      "name": "AllowAllWindowsAzureIps",
+      "apiVersion": "2014-04-01-preview",
+      "location": "[variables('location')]",
+      "properties": {
+        "startIpAddress": "0.0.0.0",
+        "endIpAddress": "0.0.0.0"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlservername'))]"
+      ]
+    }]
+  }, {
+    "type": "Microsoft.Compute/virtualMachineScaleSets",
+    "apiVersion": "2015-06-15",
+    "name": "[concat(variables('uniqueNamePrefix'),'-applicationserver')]",
+    "location": "[variables('location')]",
+    "dependsOn": [
+      "[concat('Microsoft.Storage/storageAccounts/a', variables('newStorageAccountSuffix'))]",
+      "[concat('Microsoft.Storage/storageAccounts/g', variables('newStorageAccountSuffix'))]",
+      "[concat('Microsoft.Storage/storageAccounts/m', variables('newStorageAccountSuffix'))]",
+      "[concat('Microsoft.Storage/storageAccounts/s', variables('newStorageAccountSuffix'))]",
+      "[concat('Microsoft.Storage/storageAccounts/y', variables('newStorageAccountSuffix'))]",
+      "[concat('Microsoft.Network/loadBalancers/',variables('loadBalancerNameapplicationserver'))]"
+    ],
+    "sku": {
+      "name": "Standard_A1",
+      "tier": "Standard",
+      "capacity": "2"
+    },
+    "properties": {
+      "upgradePolicy": {
+        "mode": "Automatic"
+      },
+      "virtualMachineProfile": {
+
+        "storageProfile": {
+          "osDisk": {
+            "vhdContainers": [
+              "[concat('https://a', variables('newStorageAccountSuffix'), '.blob.core.windows.net/vmss')]",
+              "[concat('https://g', variables('newStorageAccountSuffix'), '.blob.core.windows.net/vmss')]",
+              "[concat('https://m', variables('newStorageAccountSuffix'), '.blob.core.windows.net/vmss')]",
+              "[concat('https://s', variables('newStorageAccountSuffix'), '.blob.core.windows.net/vmss')]",
+              "[concat('https://y', variables('newStorageAccountSuffix'), '.blob.core.windows.net/vmss')]"
+            ],
+            "name": "vmssosdisk",
+            "caching": "ReadOnly",
+            "createOption": "FromImage"
+          },
+          "imageReference": {
+            "publisher": "OpenLogic",
+            "offer": "CentOS",
+            "sku": "7.2",
+            "version": "latest"
+          }
+        },
+        "osProfile": {
+          "computerNamePrefix": "[concat(variables('uniqueNamePrefix'),'-applicationserver')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "networkProfile": {
+          "networkInterfaceConfigurations": [{
+            "name": "nic1",
+            "properties": {
+              "primary": true,
+              "ipConfigurations": [{
+                "name": "ip1",
+                "properties": {
+                  "subnet": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', variables('resourceGroupNameToLower'), '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetnameapplicationserver'))]"
+                  },
+                  "loadBalancerBackendAddressPools": [{
+                    "id": "[variables('loadbalancerBackendpoolIdapplicationserver')]"
+                  }],
+                  "loadBalancerInboundNatPools": [{
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/',variables('resourceGroupNameToLower'), '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerNameapplicationserver'), '/inboundNatPools/natpool1')]"
+                  }]
+
+                }
+              }]
+            }
+          }]
+        },
+        "extensionProfile": {
+          "extensions": [{
+            "name": "CustomScriptExtensionVMSS",
+            "properties": {
+              "publisher": "Microsoft.OSTCExtensions",
+              "type": "CustomScriptForLinux",
+              "typeHandlerVersion": "1.4",
+              "autoUpgradeMinorVersion": true,
+              "settings": {
+                "fileUris": [
+                  "https://raw.githubusercontent.com/relution-io/azure-marketplace/master/script.sh"
+                ],
+                "commandToExecute": "[concat('sh script.sh --orga_name test --db_type mssql --db_host ',variables('sqlservername'),'.database.windows.net --db_port 1433 --db_name relution --db_user ',replace(parameters('sqlserverlogin'),'\"','\\\"'),' --db_password ',replace(parameters('sqlserverpassword'),'\"','\\\"'))]"
+              }
+            }
+          }]
         }
       }
     }
-  ]
+  }]
 }
-
