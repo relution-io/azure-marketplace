@@ -159,7 +159,7 @@ EOF
 cat > /etc/nginx/nginx.conf << "EOF"
 user  nginx;
 worker_processes  1;
-#error_log  syslog:server=localhost warn;
+error_log  syslog:server=localhost warn;
 pid        /var/run/nginx.pid;
 
 events {
@@ -176,7 +176,7 @@ http {
                 '"$request" $status $body_bytes_sent '
                 '"$http_referer" "$http_user_agent” "$http_x_forwarded_for" '
                 '$request_time $upstream_response_time $pipe';
-    #access_log  syslog:server=localhost  main;
+    access_log  syslog:server=localhost  main;
     sendfile        on;
     keepalive_timeout  65;
     index   index.html index.htm;
@@ -220,7 +220,7 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
             proxy_pass http://127.0.0.1:8080;
             proxy_read_timeout 90;
-            #proxy_http_version 1.1;
+            proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection $connection_upgrade;
         }
