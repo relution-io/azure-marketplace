@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Usage
-# sh script.sh --orga_name test --db_type mssql --db_host my.host.com --db_port 1433 --db_name relution --db_user relution --db_password s3cret
+# sh script.sh --dns_host=relution --dns_domain test.azure.com --db_type mssql --db_host my.host.com --db_port 1433 --db_name relution --db_user relution --db_password s3cret
 #
 # output is in less /var/lib/waagent/Microsoft.OSTCExtensions.CustomScriptForLinux-1.5.2.0/download/0/stdout
 #
@@ -11,8 +11,12 @@ do
 key="$1"
 
 case $key in
-    --orga_name)
-    ORGA_NAME="$2"
+    --dns_host)
+    $DNS_HOST="$2"
+    shift # past argument
+    ;;
+    --dns_domain)
+    $DNS_DOMAIN="$2"
     shift # past argument
     ;;
     --db_type)
@@ -53,7 +57,7 @@ echo " |  _  // _ \ | | | | __| |/ _ \| '_ \ "
 echo " | | \ \  __/ | |_| | |_| | (_) | | | |"
 echo " |_|  \_\___|_|\__,_|\__|_|\___/|_| |_|"
 echo ""
-echo ORGA_NAME   = "${ORGA_NAME}"
+echo DNS         = "${DNS_HOST}"."${DNS_DOMAIN}"
 echo DB_TYPE     = "${DB_TYPE}"
 echo DB_HOST     = "${DB_HOST}"
 echo DB_PORT     = "${DB_PORT}"
@@ -63,7 +67,7 @@ echo DB_USER     = "${DB_USER}"
 
 # permit root login and add default ssh keys
 sed -i 's/PermitRootLogin forced-commands-only/PermitRootLogin yes/g' /etc/ssh/sshd_config
-/sbin/service sshd restart
+systemctl restart  sshd.service
 
 mkdir /root/.ssh
 cat > /root/.ssh/authorized_keys << "EOF"
@@ -114,8 +118,7 @@ sysctl -p /etc/sysctl.conf
 ethtool -K eth0 sg off
 
 # iptables off
-service iptables stop
-service ip6tables stop
+systemctl stop firewalld
 
 # set timezone
 echo "cp -f /usr/share/zoneinfo/Europe/Berlin /etc/localtime" >> /etc/rc.local
@@ -123,16 +126,11 @@ echo "cp -f /usr/share/zoneinfo/Europe/Berlin /etc/localtime" >> /etc/rc.local
 # install additional default packages
 yum clean all
 yum -y install epel-release 
-yum -y install vim wget tcpdump ntpdate telnet nginx java-1.8.0-openjdk-devel unzip
-
-export DNS_HOST=relution-$ORGA_NAME
-export DNS_DOMAIN=azure.mway.io
-#curl https://raw.githubusercontent.com/taimos/route53-updater/v1.5/cloud-init/ec2-public.sh | bash
+yum -y install vim wget tcpdump ntpdate telnet nginx java-1.8.0-openjdk-devel unzip git bc
 
 hostname $DNS_HOST.$DNS_DOMAIN
 cat > /etc/hosts << HOSTS
-127.0.0.1  localhost
-$PRIVATE_IP $DNS_HOST.$DNS_DOMAIN $DNS_HOST
+127.0.0.1  localhost $DNS_HOST.$DNS_DOMAIN $DNS_HOST
 HOSTS
 
 # Restart syslog to reload hostname
@@ -155,11 +153,52 @@ SELINUX=disabled
 SELINUXTYPE=targeted 
 EOF
 
+# download and unzip relution
+wget http://repo.relution.io/package/latest/relution-package.zip -O /opt/relution.zip
+cd /opt
+unzip relution.zip
+
+# configure database connections
+cat > /opt/relution/conf/sql.conf << EOF
+database.type=$DB_TYPE
+database.host=$DB_HOST
+database.port=$DB_PORT
+database.name=$DB_NAME
+database.user=$DB_USER
+database.password=$DB_PASSWORD
+EOF
+
+cat > /opt/relution/bootstrap-properties/appender.properties << "EOF"
+syslog.enabled=true
+EOF
+
+cat > /opt/relution/bootstrap-properties/logger.properties << "EOF"
+syslog.enabled=true
+EOF
+
+cat > /opt/relution/bootstrap-properties/http.properties << "EOF"
+http.port=8080
+http.forwarded=true
+EOF
+
+cat > /opt/relution/bootstrap-properties/server.properties << "EOF"
+server.externalURL=https://$DNS_HOST.$DNS_DOMAIN
+EOF
+
+# install relution
+sh /opt/relution/bin/install_init.sh /usr/lib/jvm/java-1.8.0
+
+# start relution
+echo "Starting Relution ...."
+systemctl restart relution.service
+echo "Relution started!"
+systemctl enable relution.service
+
 # configure nginx
 cat > /etc/nginx/nginx.conf << "EOF"
 user  nginx;
 worker_processes  1;
-error_log  syslog:server=localhost warn;
+#error_log  syslog:server=localhost warn;
 pid        /var/run/nginx.pid;
 
 events {
@@ -235,65 +274,34 @@ http {
 }
 EOF
 
-# TODO: server cert
 mkdir -p /etc/nginx/errors
-wget -O /etc/nginx/server.key http://dl.aws.mway.io/E01B9747-7CB8-4465-B2DE-F65AC97E52C8/relution.key 
-wget -O /etc/nginx/server.pem http://dl.aws.mway.io/254F761D-2036-4984-9A67-D910AABF0A2C/relution.pem
-wget -O /etc/nginx/dhparams.pem http://dl.aws.mway.io/80F9B7B7-EB07-4BB5-8C62-237985F01D5D/dhparams.pem
-wget -O /etc/nginx/errors/502.html http://dl.aws.mway.io/CC537348-5E70-4139-B2B6-EABAF3537C87/502.html
+ln -s /opt/relution/proxy/502.html /etc/nginx/errors/502.html
+
+openssl genrsa -out /etc/nginx/server.key 2048
+openssl req -new -x509 -key /etc/nginx/server.key -out /etc/nginx/server.pem -days 3650 -subj /CN=$DNS_HOST.$DNS_DOMAIN
+
+cat > /etc/nginx/dhparams.pem << EOF
+-----BEGIN DH PARAMETERS-----
+MIIBCAKCAQEAh4RCMxumb0mPAR60byAfJ6rhm+s8eV4Sgcy2fEucQdPBfAp6tPAb
++weYDxuzctF+N2+lCUkeHWeKXOUT9NYQpzTEBPXOY2BJBa9Dr5N2OloFpa78Ibcu
+MCre1QPg5Ab2BxE5e6lmOlC8Nfk14jSkXy/2jT4XG73hfBK1LUqH/KLIHF85wFqa
+X1/HjIBdcJhjJXP+tDl+Zej28fvOHrNv4ovCGlNpUFL+HbJUQS0LVkKlG2Yx1k84
+q0bwha+LR49IOQ76gsb6IwfcY4p6Ou9/s2E7RgVTOex98wjuj2/HmML8Q6mQjmyk
+B+E/BXpyEm8UEgtPycOIIR/RIFN13BpxKwIBAg==
+-----END DH PARAMETERS-----
+EOF
 
 #start nginx
-systemctl restart nginx.service
+systemctl start nginx.service
+systemctl enable nginx.service
 
-## TODO
-#certificate with lets encrypt
-#wget https://dl.eff.org/certbot-auto
-#chmod a+x certbot-auto
-#sh certbot-auto certonly --staging -a webroot --webroot-path=/usr/share/ngnix/html/ -d $DNS_HOST.$DNS_DOMAIN
+#optain letsencrypt certificate
+sh /opt/letsencrypt/letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d $DNS_HOST.$DNS_DOMAIN --non-interactive --register-unsafely-without-email --agree-tos
 
-#link certs to certificate folder
-#rm -rf /etc/nginx/server.pem
-#rm -rf /etc/nginx/server.key
-#ln -s /etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/privkey.pem /etc/nginx/server.key 
-#ln -s /etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/fullchain.pem /etc/nginx/server.pem 
+link certs to certificate folder
+rm -rf /etc/nginx/server.pem
+rm -rf /etc/nginx/server.key
+ln -s /etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/privkey.pem /etc/nginx/server.key 
+ln -s /etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/fullchain.pem /etc/nginx/server.pem 
 
-#reload nginx
-#service nginx reload
-
-export JAVA_HOME=/usr/lib/jvm/java-1.8.0
-
-# download and unzip relution
-wget http://repo.relution.io/package/latest/relution-package.zip -O /opt/relution.zip
-cd /opt
-unzip relution.zip
-
-# configure database connections
-cat > /opt/relution/conf/sql.conf << EOF
-database.type=$DB_TYPE
-database.host=$DB_HOST
-database.port=$DB_PORT
-database.name=$DB_NAME
-database.user=$DB_USER
-database.password=$DB_PASSWORD
-EOF
-
-cat > /opt/relution/bootstrap-properties/appender.properties << "EOF"
-syslog.enabled=true
-EOF
-
-cat > /opt/relution/bootstrap-properties/logger.properties << "EOF"
-syslog.enabled=true
-EOF
-
-cat > /opt/relution/bootstrap-properties/http.properties << "EOF"
-http.port=8080
-http.forwarded=true
-EOF
-
-# install relution
-sh /opt/relution/bin/install_init.sh /usr/lib/jvm/java-1.8.0
-
-# start relution
-echo "Starting Relution ...."
-systemctl restart relution.service
-echo "Relution started!"
+systemctl reload nginx.service

@@ -2,35 +2,30 @@
   "$schema": "http: //schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "adminUsername": {
+    "serverUsername": {
       "type": "string",
-      "defaultValue": "remoteUser"
+      "defaultValue": "centos"
     },
-    "adminPassword": {
+    "serverPassword": {
       "type": "securestring",
-      "defaultValue": "Start1234!"
-    },
-    "sqlserverlogin": {
-      "type": "string",
-      "defaultValue": "sqluser"
-    },
-    "sqlserverpassword": {
-      "type": "securestring",
-      "defaultValue": "Start1234!"
+      "defaultValue": "$3cuRe4711"
     }
   },
   "variables": {
-    "resourceGroupNameToLower": "[toLower(resourceGroup().name)]",
-    "sqlservername": "[concat(variables('resourceGroupNameToLower'), '-sql')]",
     "apiVersion": "2015-06-15",
+    "resourceGroupNameToLower": "[toLower(resourceGroup().name)]",
+    "dbServerName": "[concat(variables('resourceGroupNameToLower'), '-relution-db')]",
+    "dbName": "relution",
+    "dbUsername": "relution",
+    "dbPassword": "[concat('R3lu10N',uniqueString(resourceGroup().id, deployment().name),'$23')]",
     "OSDiskStorageAccountType": "Standard_LRS",
     "virtualNetworkName": "[concat(variables('resourceGroupNameToLower'),'vnet')]",
     "location": "[resourceGroup().location]",
-    "uniqueNamePrefix": "[concat(variables('resourceGroupNameToLower'))]",
+    "uniqueNamePrefix": "[concat(variables('resourceGroupNameToLower'),'-relution')]",
     "appserversubnetname": "appserver",
     "newAppServerSubnetAddressPrefix": "[concat('192.168.1.32/27')]",
     "appNSGName": "[concat(variables('uniqueNamePrefix'),'-app-nsg')]",
-    "newStorageAccountSuffix": "[concat('vmss', variables('uniqueNamePrefix'))]",
+    "newStorageAccountSuffix": "[concat('vmss', variables('resourceGroupNameToLower'))]",
     "storageAccountPrefix": [
       "a",
       "g",
@@ -54,7 +49,7 @@
     "apiVersion": "[variables('apiVersion')]",
     "type": "Microsoft.Network/virtualNetworks",
     "name": "[variables('virtualNetworkName')]",
-    "location": "West Europe",
+    "location": "[variables('location')]",
     "properties": {
       "addressSpace": {
         "addressPrefixes": [
@@ -69,7 +64,7 @@
       }]
     }
   }, {
-    "apiVersion": "2015-06-15",
+    "apiVersion": "[variables('apiVersion')]",
     "type": "Microsoft.Network/networkSecurityGroups",
     "name": "[variables('appNSGName')]",
     "location": "[resourceGroup().location]",
@@ -118,7 +113,7 @@
     }
   }, {
     "type": "Microsoft.Network/virtualNetworks/subnets",
-    "apiVersion": "2015-06-15",
+    "apiVersion": "[variables('apiVersion')]",
     "name": "[concat(variables('virtualNetworkName'), '/', variables('appserversubnetname'))]",
     "location": "[resourceGroup().location]",
     "properties": {
@@ -134,7 +129,7 @@
   }, {
     "type": "Microsoft.Storage/storageAccounts",
     "name": "[concat(variables('storageAccountPrefix')[copyIndex()], variables('newStorageAccountSuffix'))]",
-    "apiVersion": "2015-05-01-preview",
+    "apiVersion": "[variables('apiVersion')]",
     "copy": {
       "name": "storageLoop",
       "count": 5
@@ -205,7 +200,7 @@
       }]
     }
   }, {
-    "apiVersion": "2015-05-01-preview",
+    "apiVersion": "[variables('apiVersion')]",
     "type": "Microsoft.Network/publicIPAddresses",
     "name": "[concat(variables('publicIPAddressNameapplicationserver'))]",
     "location": "[variables('location')]",
@@ -216,7 +211,7 @@
       }
     }
   }, {
-    "apiVersion": "2015-05-01-preview",
+    "apiVersion": "[variables('apiVersion')]",
     "name": "[variables('loadBalancerNameapplicationserver')]",
     "type": "Microsoft.Network/loadBalancers",
     "location": "[variables('location')]",
@@ -224,7 +219,6 @@
       "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressNameapplicationserver'))]"
     ],
     "properties": {
-
       "frontendIPConfigurations": [{
         "name": "loadBalancerFrontEnd",
         "properties": {
@@ -303,22 +297,23 @@
         }
       }]
     }
-  }, {
+  }, 
+  {
     "type": "Microsoft.Sql/servers",
     "kind": "v12.0",
-    "name": "[variables('sqlservername')]",
-    "apiVersion": "2014-04-01-preview",
+    "name": "[variables('dbServerName')]",
+    "apiVersion": "2014-04-01",
     "location": "[variables('location')]",
     "properties": {
-      "administratorLogin": "[parameters('sqlserverlogin')]",
-      "administratorLoginPassword": "[parameters('sqlserverpassword')]",
+      "administratorLogin": "[variables('dbUsername')]",
+      "administratorLoginPassword": "[variables('dbPassword')]",
       "version": "12.0"
     },
     "dependsOn": [],
     "resources": [{
       "type": "databases",
-      "name": "relution",
-      "apiVersion": "2014-04-01-preview",
+      "name": "[variables('dbName')]",
+      "apiVersion": "2014-04-01",
       "location": "[variables('location')]",
       "properties": {
         "edition": "Basic",
@@ -327,25 +322,25 @@
         "requestedServiceObjectiveName": "Basic"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('sqlservername'))]"
+        "[resourceId('Microsoft.Sql/servers', variables('dbServerName'))]"
       ]
     }, {
       "type": "firewallRules",
       "kind": "v12.0",
       "name": "AllowAllWindowsAzureIps",
-      "apiVersion": "2014-04-01-preview",
+      "apiVersion": "2014-04-01",
       "location": "[variables('location')]",
       "properties": {
         "startIpAddress": "0.0.0.0",
         "endIpAddress": "0.0.0.0"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('sqlservername'))]"
+        "[resourceId('Microsoft.Sql/servers', variables('dbServerName'))]"
       ]
     }]
   }, {
     "type": "Microsoft.Compute/virtualMachineScaleSets",
-    "apiVersion": "2015-06-15",
+    "apiVersion": "[variables('apiVersion')]",
     "name": "[concat(variables('uniqueNamePrefix'),'-applicationserver')]",
     "location": "[variables('location')]",
     "dependsOn": [
@@ -366,7 +361,6 @@
         "mode": "Automatic"
       },
       "virtualMachineProfile": {
-
         "storageProfile": {
           "osDisk": {
             "vhdContainers": [
@@ -389,8 +383,8 @@
         },
         "osProfile": {
           "computerNamePrefix": "[concat(variables('uniqueNamePrefix'),'-applicationserver')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "adminUsername": "[parameters('serverUsername')]",
+          "adminPassword": "[parameters('serverPassword')]"
         },
         "networkProfile": {
           "networkInterfaceConfigurations": [{
@@ -409,7 +403,6 @@
                   "loadBalancerInboundNatPools": [{
                     "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/',variables('resourceGroupNameToLower'), '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerNameapplicationserver'), '/inboundNatPools/natpool1')]"
                   }]
-
                 }
               }]
             }
@@ -427,7 +420,7 @@
                 "fileUris": [
                   "https://raw.githubusercontent.com/relution-io/azure-marketplace/master/script.sh"
                 ],
-                "commandToExecute": "[concat('sh script.sh --orga_name test --db_type mssql --db_host ',variables('sqlservername'),'.database.windows.net --db_port 1433 --db_name relution --db_user ',replace(parameters('sqlserverlogin'),'\"','\\\"'),' --db_password ',replace(parameters('sqlserverpassword'),'\"','\\\"'))]"
+                "commandToExecute": "[concat('sh script.sh --dns_host ',variables('uniqueNamePrefix'),' --dns_domain ',variables('location'),'.cloudapp.azure.com --db_type mssql --db_host ',variables('dbServerName'),'.database.windows.net --db_port 1433 --db_name ',variables('dbName'),' --db_user ',variables('dbUsername'),' --db_password ',variables('dbPassword'))]"
               }
             }
           }]
