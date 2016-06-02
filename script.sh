@@ -136,15 +136,26 @@ $PRIVATE_IP $DNS_HOST.$DNS_DOMAIN $DNS_HOST
 HOSTS
 
 # Restart syslog to reload hostname
-service rsyslog restart
+systemctl restart rsyslog.service
 
-# TODO: server cert
-mkdir -p /etc/nginx/errors
-wget -O /etc/nginx/server.key http://dl.aws.mway.io/E01B9747-7CB8-4465-B2DE-F65AC97E52C8/relution.key 
-wget -O /etc/nginx/server.pem http://dl.aws.mway.io/254F761D-2036-4984-9A67-D910AABF0A2C/relution.pem
-wget -O /etc/nginx/dhparams.pem http://dl.aws.mway.io/80F9B7B7-EB07-4BB5-8C62-237985F01D5D/dhparams.pem
-wget -O /etc/nginx/errors/502.html http://dl.aws.mway.io/CC537348-5E70-4139-B2B6-EABAF3537C87/502.html
+# disable selinux
+setenforce 0
+echo 0 > /selinux/enforce
+# TODO
+cat > /etc/selinux/config << EOF
+# This file controls the state of SELinux on the system.
+# SELINUX= can take one of these three values:
+#     enforcing - SELinux security policy is enforced.
+#     permissive - SELinux prints warnings instead of enforcing.
+#     disabled - No SELinux policy is loaded.
+SELINUX=disabled
+# SELINUXTYPE= can take one of these two values:
+#     targeted - Targeted processes are protected,
+#     mls - Multi Level Security protection.
+SELINUXTYPE=targeted 
+EOF
 
+# configure nginx
 cat > /etc/nginx/nginx.conf << "EOF"
 user  nginx;
 worker_processes  1;
@@ -222,31 +233,17 @@ http {
         }
     }
 }
-
 EOF
 
-# install relution
-useradd -d /opt/relution relution
-
-# disable selinux
-setenforce 0
-echo 0 > /selinux/enforce
-# TODO
-cat > /etc/selinux/config << EOF
-# This file controls the state of SELinux on the system.
-# SELINUX= can take one of these three values:
-#     enforcing - SELinux security policy is enforced.
-#     permissive - SELinux prints warnings instead of enforcing.
-#     disabled - No SELinux policy is loaded.
-SELINUX=disabled
-# SELINUXTYPE= can take one of these two values:
-#     targeted - Targeted processes are protected,
-#     mls - Multi Level Security protection.
-SELINUXTYPE=targeted 
-EOF
+# TODO: server cert
+mkdir -p /etc/nginx/errors
+wget -O /etc/nginx/server.key http://dl.aws.mway.io/E01B9747-7CB8-4465-B2DE-F65AC97E52C8/relution.key 
+wget -O /etc/nginx/server.pem http://dl.aws.mway.io/254F761D-2036-4984-9A67-D910AABF0A2C/relution.pem
+wget -O /etc/nginx/dhparams.pem http://dl.aws.mway.io/80F9B7B7-EB07-4BB5-8C62-237985F01D5D/dhparams.pem
+wget -O /etc/nginx/errors/502.html http://dl.aws.mway.io/CC537348-5E70-4139-B2B6-EABAF3537C87/502.html
 
 #start nginx
-service nginx restart
+systemctl restart nginx.service
 
 ## TODO
 #certificate with lets encrypt
@@ -265,8 +262,8 @@ service nginx restart
 
 export JAVA_HOME=/usr/lib/jvm/java-1.8.0
 
+# download and unzip relution
 wget http://repo.relution.io/package/latest/relution-package.zip -O /opt/relution.zip
-
 cd /opt
 unzip relution.zip
 
@@ -293,8 +290,10 @@ http.port=8080
 http.forwarded=true
 EOF
 
+# install relution
+sh /opt/relution/bin/install_init.sh /usr/lib/jvm/java-1.8.0
+
 # start relution
-chown -R relution:relution /opt/relution
 echo "Starting Relution ...."
-su -c "/opt/relution/bin/relution.sh start" relution
+systemctl restart relution.service
 echo "Relution started!"

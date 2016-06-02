@@ -443,7 +443,7 @@
             "imageReference": {
               "publisher": "OpenLogic",
               "offer": "CentOS",
-              "sku": "6.5",
+              "sku": "7.2",
               "version": "latest"
             }
           },
