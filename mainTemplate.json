@@ -491,7 +491,7 @@
                   "settings": {
                     "fileUris": [ 
 					
-					"https://relutiontemplates.blob.core.windows.net/relutionsingle/script.sh?st=2016-06-02T08%3A22%3A00Z&se=2099-06-03T08%3A22%3A00Z&sp=rl&sv=2015-04-05&sr=b&sig=oZxget9A1AyAcHVAzrwLG0MriRfjqa%2FlRhJiG0hS68I%3D" ],
+					"https://raw.githubusercontent.com/relution-io/azure-marketplace/master/script.sh" ],
                     "commandToExecute": "[concat('sh script.sh --orga_name test --db_type mssql --db_host ',variables('sqlservername'),'.database.windows.net --db_port 1433 --db_name relution --db_user ',parameters('sqlserverlogin'),' --db_password ',parameters('sqlserverpassword'))]"
                   }
                 }
