@@ -199,7 +199,6 @@ pip install awscli
 export AWS_ACCESS_KEY_ID=AKIAIK67VTE3MXTR56FA
 export AWS_SECRET_ACCESS_KEY=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
 cat > /root/awsrecordset.json << "EOF"
-aws route53 change-resource-record-sets --hosted-zone-id Z3QT1EHAIF1DU5 --change-batch file:///root/awsrecordset.json
 {
   "Comment": "A managed record set from a azure instance",
   "Changes": [
@@ -220,6 +219,7 @@ aws route53 change-resource-record-sets --hosted-zone-id Z3QT1EHAIF1DU5 --change
 }
 EOF
 
+aws route53 change-resource-record-sets --hosted-zone-id Z3QT1EHAIF1DU5 --change-batch file:///root/awsrecordset.json
 
 # configure nginx
 cat > /etc/nginx/nginx.conf << "EOF"
