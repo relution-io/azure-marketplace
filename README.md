@@ -15,7 +15,6 @@ You can view the UI in developer mode by [clicking here](https://portal.azure.co
 
 
 Disclaimer:
-
-The Relution license will be automatically measured through [M-Way Solutions] license service. 
-Relution is a product of M-Way Solutions GmbH
+ 
+Relution is a product of [M-Way Solutions GmbH] (http://www.mwaysolutions.com).
 
