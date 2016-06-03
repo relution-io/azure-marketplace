@@ -16,5 +16,5 @@ You can view the UI in developer mode by [clicking here](https://portal.azure.co
 
 Disclaimer:
  
-Relution is a product of [M-Way Solutions GmbH] (http://www.mwaysolutions.com).
+Relution is a product of [M-Way Solutions GmbH](http://www.mwaysolutions.com).
 
