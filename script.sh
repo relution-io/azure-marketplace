@@ -299,10 +299,16 @@ systemctl enable nginx.service
 git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
 sh /opt/letsencrypt/letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d $DNS_HOST.$DNS_DOMAIN --non-interactive --register-unsafely-without-email --agree-tos
 
-#link certs to certificate folder
-rm -rf /etc/nginx/server.pem
-rm -rf /etc/nginx/server.key
-ln -s /etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/privkey.pem /etc/nginx/server.key 
-ln -s /etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/fullchain.pem /etc/nginx/server.pem 
 
+#link certs to certificate folder
+if [ -f "/etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/privkey.pem" ]
+then
+    rm -rf /etc/nginx/server.pem
+    rm -rf /etc/nginx/server.key
+    ln -s /etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/privkey.pem /etc/nginx/server.key 
+    ln -s /etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/fullchain.pem /etc/nginx/server.pem 
+    echo "cert generated"
+else
+    echo "check /var/log/letsencrypt/letsencrypt.log"
+fi
 systemctl reload nginx.service
