@@ -2,7 +2,7 @@
 
 # Usage
 # sh script.sh --dns_host=relution --dns_domain test.azure.com --db_type mssql --db_host my.host.com --db_port 1433 --db_name relution --db_user relution --db_password s3cret
-#
+# sh script.sh --dns_host test685-relution --dns_domain japanwest.cloudapp.azure.com --db_type mssql --db_host test685-relution-db.database.windows.net --db_port 1433 --db_name relution --db_user relution --db_password R3lu10Nvoldv5fiyzn5y$23
 # output is in less /var/lib/waagent/Microsoft.OSTCExtensions.CustomScriptForLinux-1.5.2.0/download/0/stdout
 #
 
@@ -12,11 +12,11 @@ key="$1"
 
 case $key in
     --dns_host)
-    $DNS_HOST="$2"
+    DNS_HOST="$2"
     shift # past argument
     ;;
     --dns_domain)
-    $DNS_DOMAIN="$2"
+    DNS_DOMAIN="$2"
     shift # past argument
     ;;
     --db_type)
@@ -295,10 +295,11 @@ EOF
 systemctl start nginx.service
 systemctl enable nginx.service
 
-#optain letsencrypt certificate
+#letsencrypt certificate
+git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
 sh /opt/letsencrypt/letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d $DNS_HOST.$DNS_DOMAIN --non-interactive --register-unsafely-without-email --agree-tos
 
-link certs to certificate folder
+#link certs to certificate folder
 rm -rf /etc/nginx/server.pem
 rm -rf /etc/nginx/server.key
 ln -s /etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/privkey.pem /etc/nginx/server.key 
