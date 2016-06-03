@@ -126,7 +126,7 @@ echo "cp -f /usr/share/zoneinfo/Europe/Berlin /etc/localtime" >> /etc/rc.local
 # install additional default packages
 yum clean all
 yum -y install epel-release 
-yum -y install vim wget tcpdump ntpdate telnet nginx java-1.8.0-openjdk-devel unzip git bc
+yum -y install vim wget tcpdump ntpdate telnet nginx java-1.8.0-openjdk-devel unzip git bc python-pip
 
 hostname $DNS_HOST.$DNS_DOMAIN
 cat > /etc/hosts << HOSTS
@@ -193,6 +193,33 @@ echo "Starting Relution ...."
 systemctl restart relution.service
 echo "Relution started!"
 systemctl enable relution.service
+
+#add host to aws
+pip install awscli
+export AWS_ACCESS_KEY_ID=AKIAIK67VTE3MXTR56FA
+export AWS_SECRET_ACCESS_KEY=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
+cat > /root/awsrecordset.json << "EOF"
+aws route53 change-resource-record-sets --hosted-zone-id Z3QT1EHAIF1DU5 --change-batch file:///root/awsrecordset.json
+{
+  "Comment": "A managed record set from a azure instance",
+  "Changes": [
+    {
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "$DNS_HOST.azure.mway.io.",
+        "Type": "CNAME",
+        "TTL": 60,
+        "ResourceRecords": [
+          {
+            "Value": "$DNS_HOST.$DNS_DOMAIN"
+          }
+        ]
+      }
+    }
+  ]
+}
+EOF
+
 
 # configure nginx
 cat > /etc/nginx/nginx.conf << "EOF"
@@ -278,7 +305,7 @@ mkdir -p /etc/nginx/errors
 ln -s /opt/relution/proxy/502.html /etc/nginx/errors/502.html
 
 openssl genrsa -out /etc/nginx/server.key 2048
-openssl req -new -x509 -key /etc/nginx/server.key -out /etc/nginx/server.pem -days 3650 -subj /CN=$DNS_HOST.$DNS_DOMAIN
+openssl req -new -x509 -key /etc/nginx/server.key -out /etc/nginx/server.pem -days 3650 -subj /CN=$DNS_HOST.azure.mway.io
 
 cat > /etc/nginx/dhparams.pem << EOF
 -----BEGIN DH PARAMETERS-----
@@ -297,16 +324,15 @@ systemctl enable nginx.service
 
 #letsencrypt certificate
 git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
-sh /opt/letsencrypt/letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d $DNS_HOST.$DNS_DOMAIN --non-interactive --register-unsafely-without-email --agree-tos
-
+sh /opt/letsencrypt/letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d $DNS_HOST.azure.mway.io --non-interactive --register-unsafely-without-email --agree-tos
 
 #link certs to certificate folder
-if [ -f "/etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/privkey.pem" ]
+if [ -f /etc/letsencrypt/live/$DNS_HOST.azure.mway.io/privkey.pem ]
 then
     rm -rf /etc/nginx/server.pem
     rm -rf /etc/nginx/server.key
-    ln -s /etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/privkey.pem /etc/nginx/server.key 
-    ln -s /etc/letsencrpt/live/$DNS_HOST.$DNS_DOMAIN/fullchain.pem /etc/nginx/server.pem 
+    ln -s /etc/letsencrypt/live/$DNS_HOST.azure.mway.io/privkey.pem /etc/nginx/server.key 
+    ln -s /etc/letsencrypt/live/$DNS_HOST.azure.mway.io/fullchain.pem /etc/nginx/server.pem 
     echo "cert generated"
 else
     echo "check /var/log/letsencrypt/letsencrypt.log"
