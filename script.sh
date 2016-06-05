@@ -4,7 +4,7 @@
 # sh script.sh --dns_host=relution --dns_domain test.azure.com --db_type mssql --db_host my.host.com --db_port 1433 --db_name relution --db_user relution --db_password s3cret
 # 
 # output is in /var/lib/waagent/Microsoft.OSTCExtensions.CustomScriptForLinux-1.5.2.0/download/0/stdout
-#
+
 
 while [[ $# > 1 ]]
 do
@@ -196,10 +196,9 @@ systemctl enable relution.service
 
 #add host to aws
 pip install awscli
-SUFFIX = -relution
-AWS_HOST = ${DNS_HOST%$SUFFIX}
-export AWS_ACCESS_KEY_ID=AKIAIK67VTE3MXTR56FA
-export AWS_SECRET_ACCESS_KEY=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
+export AWS_HOST=${DNS_HOST%"-relution"}
+export AWS_ACCESS_KEY_ID="AKIAIK67VTE3MXTR56FA"
+export AWS_SECRET_ACCESS_KEY="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"
 cat > /root/awsrecordset.json << EOF
 {
   "Comment": "A managed record set from a azure instance",
