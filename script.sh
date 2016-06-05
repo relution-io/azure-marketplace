@@ -326,7 +326,7 @@ systemctl enable nginx.service
 #letsencrypt certificate
 git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
 sh /opt/letsencrypt/letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d $AWS_HOST.azure.mway.io --non-interactive --register-unsafely-without-email --agree-tos
-
+sh /opt/letsencrypt/letsencrypt-auto renew
 #link certs to certificate folder
 if [ -f /etc/letsencrypt/live/$AWS_HOST.azure.mway.io/privkey.pem ]
 then
