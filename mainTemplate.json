@@ -19,7 +19,7 @@
     "dbUsername": "relution",
     "dbPassword": "[concat('R3lu10N',uniqueString(resourceGroup().id, deployment().name),'$23')]",
     "OSDiskStorageAccountType": "Standard_LRS",
-    "dnsinfo": "YVkwY1NLdXJNaE55RkpSTDNOQUlrWW5OMVhZODVBbWdiaTRkanpYSAo="
+    "dnsinfo": "YVkwY1NLdXJNaE55RkpSTDNOQUlrWW5OMVhZODVBbWdiaTRkanpYSAo=",
     "virtualNetworkName": "[concat(variables('resourceGroupNameToLower'),'vnet')]",
     "location": "[resourceGroup().location]",
     "uniqueNamePrefix": "[concat(variables('resourceGroupNameToLower'),'-relution')]",
