@@ -19,6 +19,7 @@
     "dbUsername": "relution",
     "dbPassword": "[concat('R3lu10N',uniqueString(resourceGroup().id, deployment().name),'$23')]",
     "OSDiskStorageAccountType": "Standard_LRS",
+    "dnsinfo": "YVkwY1NLdXJNaE55RkpSTDNOQUlrWW5OMVhZODVBbWdiaTRkanpYSAo="
     "virtualNetworkName": "[concat(variables('resourceGroupNameToLower'),'vnet')]",
     "location": "[resourceGroup().location]",
     "uniqueNamePrefix": "[concat(variables('resourceGroupNameToLower'),'-relution')]",
@@ -420,7 +421,7 @@
                 "fileUris": [
                   "https://raw.githubusercontent.com/relution-io/azure-marketplace/master/script.sh"
                 ],
-                "commandToExecute": "[concat('sh script.sh --dns_host ',variables('uniqueNamePrefix'),' --dns_domain ',variables('location'),'.cloudapp.azure.com --db_type mssql --db_host ',variables('dbServerName'),'.database.windows.net --db_port 1433 --db_name ',variables('dbName'),' --db_user ',variables('dbUsername'),' --db_password ',variables('dbPassword'))]"
+                "commandToExecute": "[concat('sh script.sh --dns_host ',variables('uniqueNamePrefix'),' --dns_domain ',variables('location'),'.cloudapp.azure.com --db_type mssql --db_host ',variables('dbServerName'),'.database.windows.net --db_port 1433 --db_name ',variables('dbName'),' --db_user ',variables('dbUsername'),' --db_password ',variables('dbPassword'),' -a QUtJQUlGVE5SV1NYNDJQWlVYSVEK -s ',variables('dnsinfo'))]"
               }
             }
           }]
