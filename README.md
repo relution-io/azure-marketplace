@@ -1,29 +1,29 @@
 # Relution Azure Marketplace
 
-This is an easy to use template to deploy Relution Server on Microsoft Azure infrastructure.
-If you need information first what Relution is for or what services Relution provides, please read [here] (http://www.relution.io) before.
+This is an easy to use template to deploy a Relution Server on Microsoft Azure infrastructure.
+If you want to learn more about Relution please check out our [Website] (http://www.relution.io).
 
-The template creates a Relution server including SQL Database. 
-Our Relution freemium license grant you the permission to run our software on a dedicated instance for evaluation purposes.
+The template creates a Relution server node and includes a SQL Database. 
+The Relution free license grants you the permission to run a Relution server on a dedicated instance for evaluation purposes with maximal 10 users.
 
-There could be additional costs to run the service in Azure cloud your are responsible for.
+Additional costs by Microsoft for the operation of Relution in the Azure cloud will occur.
 
 You can view the UI in developer mode by [clicking here](https://portal.azure.com/#blade/Microsoft_Azure_Compute/CreateMultiVmWizardBlade/internal_bladeCallId/anything/internal_bladeCallerParams/{"initialData":{},"providerConfig":{"createUiDefinition":"https%3A%2F%2Fraw.githubusercontent.com%2Frelution-io%2Fazure-marketplace%2Fmaster%2FcreateUiDefinition.json"}}). If you feel something is cached improperly use [this client unoptimized link instead](https://portal.azure.com/?clientOptimizations=false#blade/Microsoft_Azure_Compute/CreateMultiVmWizardBlade/internal_bladeCallId/anything/internal_bladeCallerParams/{"initialData":{},"providerConfig":{"createUiDefinition":"https%3A%2F%2Fraw.githubusercontent.com%2Frelution-io%2Fazure-marketplace%2Fmaster%2FcreateUiDefinition.json"}})
 
-Before you click on the button below:
+Please check following points before deploying a Relution server through a click on the button below:
 
 1. Have your credentials available for the Azure platform
-2. We provide you with a template where you have to enter few data:
-    - Choose a name for your Service e.g. 'RelutionTrail'
+2. Enter following data in the given template:
+    - Choose a name for your service e.g. 'MyRelutionDemo'
     - Choose a strong password - choose a really strong password!
-    - Enter a ResourceGroupName "e.g. relution1" to identify all resources which are belongs to this service and keep it in mind (It will be your subdomin address to get access to your instance.)
-    - Accept License Aggrement of Azure platform.
-    - Being patient it takes a while until Relution server is launched
-    - Now get access to your server under: https://&lt;ResourceGroupName&gt;.azure.mway.io (user: admin, password: admin123)
-     (Please change your Password first after your server is launched. We will improve this in the future.)
+    - Enter a ResourceGroupName "e.g. relution1" to identify all resources which belong to this service and remember this name (It will be your subdomin address to get access to your instance)
+    - Accept the license agreement of the Azure platform
+    - Be patient until the Relution server is launched
+    - Now get access to your server at: https://&lt;ResourceGroupName&gt;.azure.mway.io (user: admin, password: admin123)
+     (Please change your password immediately after your server is launched)
     
  
-### Deploy Relution Server on Azure
+### Deploy Relution to Azure
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Frelution-io%2Fazure-marketplace%2Fmaster%2FmainTemplate.json" target="_blank">
    <img alt="Deploy to Azure" src="http://azuredeploy.net/deploybutton.png"/>
@@ -34,6 +34,6 @@ Before you click on the button below:
 Disclaimer:
  
 Relution is a product of [M-Way Solutions GmbH](http://www.mwaysolutions.com).
-Server license will be automatically measured through M-Way Solutions license service.
+Server license will be automatically measured through a M-Way Solutions license service.
 
 
