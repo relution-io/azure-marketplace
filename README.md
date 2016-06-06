@@ -15,7 +15,7 @@ Before you click on the button below:
 1. Have your credentials available for the Azure platform
 2. We provide you with a template where you have to enter few data:
     - Choose a name for your Service e.g. 'RelutionTrail'
-    - Choose a strong password - choose a really strong passord!
+    - Choose a strong password - choose a really strong password!
     - Enter a ResourceGroupName "e.g. relution1" to identify all resources which are belongs to this service and keep it in mind (It will be your subdomin address to get access to your instance.)
     - Accept License Aggrement of Azure platform.
     - Being patient it takes a while until Relution server is launched
