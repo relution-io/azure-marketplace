@@ -28,9 +28,6 @@ Please check following points before deploying a Relution server through a click
 </a>
 
 
-Testing 'createUiDefinition':
-
-You can view the UI in developer mode by [clicking here](https://portal.azure.com/#blade/Microsoft_Azure_Compute/CreateMultiVmWizardBlade/internal_bladeCallId/anything/internal_bladeCallerParams/{"initialData":{},"providerConfig":{"createUiDefinition":"https%3A%2F%2Fraw.githubusercontent.com%2Frelution-io%2Fazure-marketplace%2Fmaster%2FcreateUiDefinition.json"}}). If you feel something is cached improperly use [this client unoptimized link instead](https://portal.azure.com/?clientOptimizations=false#blade/Microsoft_Azure_Compute/CreateMultiVmWizardBlade/internal_bladeCallId/anything/internal_bladeCallerParams/{"initialData":{},"providerConfig":{"createUiDefinition":"https%3A%2F%2Fraw.githubusercontent.com%2Frelution-io%2Fazure-marketplace%2Fmaster%2FcreateUiDefinition.json"}})
 
 
 Disclaimer:
@@ -39,3 +36,6 @@ Relution is a product of [M-Way Solutions GmbH](http://www.mwaysolutions.com).
 Server license will be automatically measured through a M-Way Solutions license service.
 
 
+Testing 'createUiDefinition':
+
+You can view the UI in developer mode by [clicking here](https://portal.azure.com/#blade/Microsoft_Azure_Compute/CreateMultiVmWizardBlade/internal_bladeCallId/anything/internal_bladeCallerParams/{"initialData":{},"providerConfig":{"createUiDefinition":"https%3A%2F%2Fraw.githubusercontent.com%2Frelution-io%2Fazure-marketplace%2Fmaster%2FcreateUiDefinition.json"}}). If you feel something is cached improperly use [this client unoptimized link instead.](https://portal.azure.com/?clientOptimizations=false#blade/Microsoft_Azure_Compute/CreateMultiVmWizardBlade/internal_bladeCallId/anything/internal_bladeCallerParams/{"initialData":{},"providerConfig":{"createUiDefinition":"https%3A%2F%2Fraw.githubusercontent.com%2Frelution-io%2Fazure-marketplace%2Fmaster%2FcreateUiDefinition.json"}})
