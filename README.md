@@ -8,8 +8,6 @@ The Relution free license grants you the permission to run a Relution server on 
 
 Additional costs by Microsoft for the operation of Relution in the Azure cloud will occur.
 
-You can view the UI in developer mode by [clicking here](https://portal.azure.com/#blade/Microsoft_Azure_Compute/CreateMultiVmWizardBlade/internal_bladeCallId/anything/internal_bladeCallerParams/{"initialData":{},"providerConfig":{"createUiDefinition":"https%3A%2F%2Fraw.githubusercontent.com%2Frelution-io%2Fazure-marketplace%2Fmaster%2FcreateUiDefinition.json"}}). If you feel something is cached improperly use [this client unoptimized link instead](https://portal.azure.com/?clientOptimizations=false#blade/Microsoft_Azure_Compute/CreateMultiVmWizardBlade/internal_bladeCallId/anything/internal_bladeCallerParams/{"initialData":{},"providerConfig":{"createUiDefinition":"https%3A%2F%2Fraw.githubusercontent.com%2Frelution-io%2Fazure-marketplace%2Fmaster%2FcreateUiDefinition.json"}})
-
 Please check following points before deploying a Relution server through a click on the button below:
 
 1. Have your credentials available for the Azure platform
@@ -29,6 +27,10 @@ Please check following points before deploying a Relution server through a click
    <img alt="Deploy to Azure" src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
+
+Testing 'createUiDefinition':
+
+You can view the UI in developer mode by [clicking here](https://portal.azure.com/#blade/Microsoft_Azure_Compute/CreateMultiVmWizardBlade/internal_bladeCallId/anything/internal_bladeCallerParams/{"initialData":{},"providerConfig":{"createUiDefinition":"https%3A%2F%2Fraw.githubusercontent.com%2Frelution-io%2Fazure-marketplace%2Fmaster%2FcreateUiDefinition.json"}}). If you feel something is cached improperly use [this client unoptimized link instead](https://portal.azure.com/?clientOptimizations=false#blade/Microsoft_Azure_Compute/CreateMultiVmWizardBlade/internal_bladeCallId/anything/internal_bladeCallerParams/{"initialData":{},"providerConfig":{"createUiDefinition":"https%3A%2F%2Fraw.githubusercontent.com%2Frelution-io%2Fazure-marketplace%2Fmaster%2FcreateUiDefinition.json"}})
 
 
 Disclaimer:
