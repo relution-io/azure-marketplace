@@ -43,6 +43,14 @@ case $key in
     DB_PASSWORD="$2"
     shift # past argument
     ;;
+    -s)
+    SECRET="$(openssl enc -base64 -d <<< "$2")"
+    shift # past argument
+    ;;
+    -a)
+    ACCESS="$(openssl enc -base64 -d <<< "$2")"
+    shift # past argument
+    ;;
     *)
             # unknown option
     ;;
@@ -63,7 +71,6 @@ echo DB_HOST     = "${DB_HOST}"
 echo DB_PORT     = "${DB_PORT}"
 echo DB_NAME     = "${DB_NAME}"
 echo DB_USER     = "${DB_USER}"
-
 
 # permit root login and add default ssh keys
 sed -i 's/PermitRootLogin forced-commands-only/PermitRootLogin yes/g' /etc/ssh/sshd_config
@@ -197,8 +204,8 @@ systemctl enable relution.service
 #add host to aws
 pip install awscli
 export AWS_HOST=${DNS_HOST%"-relution"}
-export AWS_ACCESS_KEY_ID="AKIAIK67VTE3MXTR56FA"
-export AWS_SECRET_ACCESS_KEY="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"
+export AWS_ACCESS_KEY_ID=$ACCESS
+export AWS_SECRET_ACCESS_KEY=$SECRET
 cat > /root/awsrecordset.json << EOF
 {
   "Comment": "A managed record set from a azure instance",
