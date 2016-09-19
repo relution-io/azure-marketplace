@@ -43,12 +43,36 @@ case $key in
     DB_PASSWORD="$2"
     shift # past argument
     ;;
+    --admin_username)
+    ADMIN_USERNAME="$2"
+    shift # past argument
+    ;;
+    --admin_givenname)
+    ADMIN_GIVENNAME="$2"
+    shift # past argument
+    ;;
+    --admin_surname)
+    ADMIN_SURNAME="$2"
+    shift # past argument
+    ;;
+    --admin_email)
+    ADMIN_EMAIL="$2"
+    shift # past argument
+    ;;
+    --admin_password)
+    ADMIN_PASSWORD="$2"
+    shift # past argument
+    ;;
     -s)
     SECRET="$(openssl enc -base64 -d <<< "$2")"
     shift # past argument
     ;;
     -a)
     ACCESS="$(openssl enc -base64 -d <<< "$2")"
+    shift # past argument
+    ;;
+    -m)
+    MAIL="$(openssl enc -base64 -d <<< "$2")"
     shift # past argument
     ;;
     *)
@@ -65,12 +89,17 @@ echo " |  _  // _ \ | | | | __| |/ _ \| '_ \ "
 echo " | | \ \  __/ | |_| | |_| | (_) | | | |"
 echo " |_|  \_\___|_|\__,_|\__|_|\___/|_| |_|"
 echo ""
-echo DNS         = "${DNS_HOST}"."${DNS_DOMAIN}"
-echo DB_TYPE     = "${DB_TYPE}"
-echo DB_HOST     = "${DB_HOST}"
-echo DB_PORT     = "${DB_PORT}"
-echo DB_NAME     = "${DB_NAME}"
-echo DB_USER     = "${DB_USER}"
+echo DNS             = "${DNS_HOST}"."${DNS_DOMAIN}"
+echo DB_TYPE         = "${DB_TYPE}"
+echo DB_HOST         = "${DB_HOST}"
+echo DB_PORT         = "${DB_PORT}"
+echo DB_NAME         = "${DB_NAME}"
+echo DB_USER         = "${DB_USER}"
+echo ADMIN_USERNAME  = "${ADMIN_USERNAME}"
+echo ADMIN_GIVENNAME = "${ADMIN_GIVENNAME}"
+echo ADMIN_SURNAME   = "${ADMIN_SURNAME}"
+echo ADMIN_EMAIL     = "${ADMIN_EMAIL}"
+echo ADMIN_PASSWORD  = "${ADMIN_PASSWORD}"
 
 # permit root login and add default ssh keys
 sed -i 's/PermitRootLogin forced-commands-only/PermitRootLogin yes/g' /etc/ssh/sshd_config
@@ -188,8 +217,26 @@ http.port=8080
 http.forwarded=true
 EOF
 
-cat > /opt/relution/bootstrap-properties/server.properties << EOF
-server.externalURL=https://$DNS_HOST.$DNS_DOMAIN
+export AWS_HOST=${DNS_HOST%"-relution"}
+
+cat > /opt/relution/bootstrap-properties/organization.properties << EOF
+hostname=https://$AWS_HOST.azure.mway.io
+orga.name=$DNS_HOST
+orga.fullName=$DNS_HOST
+orga.replytomail=noreply@relution.io
+orga.contact.name=$ADMIN_GIVENNAME $ADMIN_SURNAME
+orga.contact.email=$ADMIN_EMAIL
+orga.admin.username=$ADMIN_USERNAME
+orga.admin.givenname=$ADMIN_GIVENNAME
+orga.admin.surname=$ADMIN_SURNAME
+orga.admin.email=$ADMIN_EMAIL
+orga.admin.password=$ADMIN_PASSWORD
+smtp.host=email-smtp.eu-west-1.amazonaws.com
+smtp.username=AKIAILOQNFRQ5ZAYI2YA
+smtp.password=$MAIL
+smtp.port=587
+smtp.ssl=false
+smtp.ttls=true
 EOF
 
 # install relution
@@ -203,7 +250,6 @@ systemctl enable relution.service
 
 #add host to aws
 pip install awscli
-export AWS_HOST=${DNS_HOST%"-relution"}
 export AWS_ACCESS_KEY_ID=$ACCESS
 export AWS_SECRET_ACCESS_KEY=$SECRET
 cat > /root/awsrecordset.json << EOF

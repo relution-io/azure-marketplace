@@ -9,7 +9,27 @@
     "serverPassword": {
       "type": "securestring",
       "defaultValue": "$3cuRe4711"
-    }
+    },
+    "adminUsername": {
+      "type": "string",
+      "defaultValue": "adminUser"
+    },
+    "adminGivenname": {
+      "type": "string",
+      "defaultValue": "givenname"
+    },
+    "adminSurname": {
+      "type": "string",
+      "defaultValue": "surname"
+    },
+    "adminEmail": {
+      "type": "string",
+      "defaultValue": "info@relution.io"
+    },
+    "adminPassword": {
+      "type": "string",
+      "defaultValue": "$3cuRe4711"
+    },
   },
   "variables": {
     "apiVersion": "2015-06-15",
@@ -421,7 +441,7 @@
                 "fileUris": [
                   "https://raw.githubusercontent.com/relution-io/azure-marketplace/master/script.sh"
                 ],
-                "commandToExecute": "[concat('sh script.sh --dns_host ',variables('uniqueNamePrefix'),' --dns_domain ',variables('location'),'.cloudapp.azure.com --db_type mssql --db_host ',variables('dbServerName'),'.database.windows.net --db_port 1433 --db_name ',variables('dbName'),' --db_user ',variables('dbUsername'),' --db_password ',variables('dbPassword'),' -a QUtJQUlGVE5SV1NYNDJQWlVYSVEK -s ',variables('dnsinfo'))]"
+                "commandToExecute": "[concat('sh script.sh --dns_host ',variables('uniqueNamePrefix'),' --dns_domain ',variables('location'),'.cloudapp.azure.com --db_type mssql --db_host ',variables('dbServerName'),'.database.windows.net --db_port 1433 --db_name ',variables('dbName'),' --db_user ',variables('dbUsername'),' --db_password ',variables('dbPassword'),' --admin_username ',parameters('adminUsername'),' --admin_password ',parameters('adminPassword'),' --admin_email ',parameters('adminEmail'),' --admin_givenname ',parameters('adminGivenname'),' --admin_surname ',parameters('adminSurname'),'-m QWdFajRJeGpyOHl4b2tRNFVVdkVFWlRYdlJNcVlkWXNYRVRqZTI5cnI4Y0I= -a QUtJQUlGVE5SV1NYNDJQWlVYSVEK -s ',variables('dnsinfo'))]"
               }
             }
           }]
