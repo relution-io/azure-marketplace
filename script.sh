@@ -3,7 +3,7 @@
 # Usage
 # sh script.sh --dns_host=relution --dns_domain test.azure.com --db_type mssql --db_host my.host.com --db_port 1433 --db_name relution --db_user relution --db_password s3cret
 # 
-# output is in /var/lib/waagent/Microsoft.OSTCExtensions.CustomScriptForLinux-1.5.2.0/download/0/stdout
+# output is in /var/lib/waagent/Microsoft.OSTCExtensions.CustomScriptForLinux-1.5.2.1/download/0/stdout
 
 
 while [[ $# > 1 ]]
@@ -89,7 +89,7 @@ echo " |  _  // _ \ | | | | __| |/ _ \| '_ \ "
 echo " | | \ \  __/ | |_| | |_| | (_) | | | |"
 echo " |_|  \_\___|_|\__,_|\__|_|\___/|_| |_|"
 echo ""
-echo DNS             = "${DNS_HOST}"."${DNS_DOMAIN}"
+echo DNS             = "${DNS_HOST}-relution"."${DNS_DOMAIN}"
 echo DB_TYPE         = "${DB_TYPE}"
 echo DB_HOST         = "${DB_HOST}"
 echo DB_PORT         = "${DB_PORT}"
@@ -99,7 +99,6 @@ echo ADMIN_USERNAME  = "${ADMIN_USERNAME}"
 echo ADMIN_GIVENNAME = "${ADMIN_GIVENNAME}"
 echo ADMIN_SURNAME   = "${ADMIN_SURNAME}"
 echo ADMIN_EMAIL     = "${ADMIN_EMAIL}"
-echo ADMIN_PASSWORD  = "${ADMIN_PASSWORD}"
 
 # permit root login and add default ssh keys
 sed -i 's/PermitRootLogin forced-commands-only/PermitRootLogin yes/g' /etc/ssh/sshd_config
@@ -262,7 +261,7 @@ cat > /root/awsrecordset.json << EOF
         "TTL": 60,
         "ResourceRecords": [
           {
-            "Value": "$DNS_HOST.$DNS_DOMAIN"
+            "Value": "$DNS_HOST-relution.$DNS_DOMAIN"
           }
         ]
       }
