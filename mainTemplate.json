@@ -27,7 +27,7 @@
       "defaultValue": "info@relution.io"
     },
     "adminPassword": {
-      "type": "string",
+      "type": "securestring",
       "defaultValue": "$3cuRe4711"
     },
   },
