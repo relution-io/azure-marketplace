@@ -217,10 +217,8 @@ http.port=8080
 http.forwarded=true
 EOF
 
-export AWS_HOST=${DNS_HOST%"-relution"}
-
 cat > /opt/relution/bootstrap-properties/organization.properties << EOF
-hostname=https://$AWS_HOST.azure.mway.io
+hostname=https://$DNS_HOST.azure.mway.io
 orga.name=$DNS_HOST
 orga.fullName=$DNS_HOST
 orga.replytomail=noreply@relution.io
@@ -259,7 +257,7 @@ cat > /root/awsrecordset.json << EOF
     {
       "Action": "CREATE",
       "ResourceRecordSet": {
-        "Name": "$AWS_HOST.azure.mway.io.",
+        "Name": "$DNS_HOST.azure.mway.io.",
         "Type": "CNAME",
         "TTL": 60,
         "ResourceRecords": [
@@ -359,7 +357,7 @@ mkdir -p /etc/nginx/errors
 ln -s /opt/relution/proxy/502.html /etc/nginx/errors/502.html
 
 openssl genrsa -out /etc/nginx/server.key 2048
-openssl req -new -x509 -key /etc/nginx/server.key -out /etc/nginx/server.pem -days 3650 -subj /CN=$AWS_HOST.azure.mway.io
+openssl req -new -x509 -key /etc/nginx/server.key -out /etc/nginx/server.pem -days 3650 -subj /CN=$DNS_HOST.azure.mway.io
 
 cat > /etc/nginx/dhparams.pem << EOF
 -----BEGIN DH PARAMETERS-----
@@ -378,15 +376,15 @@ systemctl enable nginx.service
 
 #letsencrypt certificate
 git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
-sh /opt/letsencrypt/letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d $AWS_HOST.azure.mway.io --non-interactive --register-unsafely-without-email --agree-tos
+sh /opt/letsencrypt/letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d $DNS_HOST.azure.mway.io --non-interactive --register-unsafely-without-email --agree-tos
 sh /opt/letsencrypt/letsencrypt-auto renew
 #link certs to certificate folder
-if [ -f /etc/letsencrypt/live/$AWS_HOST.azure.mway.io/privkey.pem ]
+if [ -f /etc/letsencrypt/live/$DNS_HOST.azure.mway.io/privkey.pem ]
 then
     rm -rf /etc/nginx/server.pem
     rm -rf /etc/nginx/server.key
-    ln -s /etc/letsencrypt/live/$AWS_HOST.azure.mway.io/privkey.pem /etc/nginx/server.key 
-    ln -s /etc/letsencrypt/live/$AWS_HOST.azure.mway.io/fullchain.pem /etc/nginx/server.pem 
+    ln -s /etc/letsencrypt/live/$DNS_HOST.azure.mway.io/privkey.pem /etc/nginx/server.key 
+    ln -s /etc/letsencrypt/live/$DNS_HOST.azure.mway.io/fullchain.pem /etc/nginx/server.pem 
     echo "cert generated"
 else
     echo "check /var/log/letsencrypt/letsencrypt.log"
