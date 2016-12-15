@@ -10,50 +10,60 @@
       "constraints": {
         "required": true
       },
-      "osPlatform": "Linux"
+      "osPlatform": "Linux",
+      "visible": true
     }, {
       "name": "serverPassword",
       "type": "Microsoft.Compute.CredentialsCombo",
       "label": {
+        "authenticationType": "Authentication Type",
         "password": "Password",
-        "confirmPassword": "Confirm password"
+        "confirmPassword": "Confirm password",
+        "sshPublicKey": "SSH public key"
       },
       "toolTip": {
-        "password": "Admin password for the virtual machines."
+        "authenticationType": "",
+        "password": "Admin password for the virtual machines.",
+        "sshPublicKey": "SSH public key"
       },
       "constraints": {
         "required": true
       },
       "options": {
-        "hideConfirmation": false
+        "hideConfirmation": false,
+        "hidePassword": false
       },
-      "osPlatform": "Linux"
+      "osPlatform": "Linux",
+      "visible": true
     }, {
       "name": "adminUsername",
       "type": "Microsoft.Common.TextBox",
       "label": "Admin user name",
-      "defaultValue": "",
+      "defaultValue": "admin",
       "toolTip": "Admin username for the Relution Account.",
       "constraints": {
-        "required": true
-      }
+        "required": true,
+        "regex": "^[a-z0-9A-Z]{1,30}$",
+        "validationMessage": "Only alphanumeric characters are allowed, and the value must be 1-30 characters long."
+      },
+      "visible": true
     }, {
       "name": "adminPassword",
-      "type": "Microsoft.Compute.CredentialsCombo",
+      "type": "Microsoft.Common.PasswordBox",
       "label": {
         "password": "Admin password",
         "confirmPassword": "Confirm password"
       },
-      "toolTip": {
-        "password": "Admin password for the Relution Account."
-      },
+      "toolTip": "Admin password for the Relution Account.",
       "constraints": {
-        "required": true
+        "required": true,
+        "regex": "^[a-z0-9A-Z]{8,30}$",
+        "validationMessage": "Only alphanumeric characters are allowed, and the value must be 8-30 characters long."
       },
       "options": {
         "hideConfirmation": false
       },
-      "osPlatform": "Linux"
+      "visible": true
     }, {
       "name": "adminGivenname",
       "type": "Microsoft.Common.TextBox",
@@ -62,7 +72,8 @@
       "toolTip": "Given name",
       "constraints": {
         "required": true
-      }
+      },
+      "visible": true
     }, {
       "name": "adminSurname",
       "type": "Microsoft.Common.TextBox",
@@ -71,7 +82,8 @@
       "toolTip": "Last name",
       "constraints": {
         "required": true
-      }
+      },
+      "visible": true
     }, {
       "name": "adminEmail",
       "type": "Microsoft.Common.TextBox",
@@ -80,7 +92,8 @@
       "toolTip": "E-Mail",
       "constraints": {
         "required": true
-      }
+      },
+      "visible": true
     }],
     "outputs": {
       "serverUsername": "[basics('serverUsername')]",
