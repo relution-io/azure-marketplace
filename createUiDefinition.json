@@ -36,9 +36,83 @@
       "osPlatform": "Linux",
       "visible": true
     }],
+    "steps": [{
+      "name": "relutionAdmin",
+      "label": "Relution Account credetials",
+      "subLabel": {
+        "preValidation": "Configure the reltuion admin",
+        "postValidation": "Done"
+      },
+      "bladeTitle": "Relution Admin",
+      "elements": [{
+        "name": "adminUsername",
+        "type": "Microsoft.Common.TextBox",
+        "label": "Admin user name",
+        "defaultValue": "admin",
+        "toolTip": "Admin username for the Relution Account.",
+        "constraints": {
+          "required": true,
+          "regex": "^[a-z0-9A-Z]{1,30}$",
+          "validationMessage": "Only alphanumeric characters are allowed, and the value must be 1-30 characters long."
+        },
+        "visible": true
+      }, {
+        "name": "adminPassword",
+        "type": "Microsoft.Common.PasswordBox",
+        "label": {
+          "password": "Admin password",
+          "confirmPassword": "Confirm password"
+        },
+        "toolTip": "Admin password for the Relution Account.",
+        "constraints": {
+          "required": true,
+          "regex": "^[a-z0-9A-Z]{8,30}$",
+          "validationMessage": "Only alphanumeric characters are allowed, and the value must be 8-30 characters long."
+        },
+        "options": {
+          "hideConfirmation": false
+        },
+        "visible": true
+      }, {
+        "name": "adminGivenname",
+        "type": "Microsoft.Common.TextBox",
+        "label": "Admin first name",
+        "defaultValue": "",
+        "toolTip": "Given name",
+        "constraints": {
+          "required": true
+        },
+        "visible": true
+      }, {
+        "name": "adminSurname",
+        "type": "Microsoft.Common.TextBox",
+        "label": "Admin last name",
+        "defaultValue": "",
+        "toolTip": "Last name",
+        "constraints": {
+          "required": true
+        },
+        "visible": true
+      }, {
+        "name": "adminEmail",
+        "type": "Microsoft.Common.TextBox",
+        "label": "Relution Admin E-Mail",
+        "defaultValue": "",
+        "toolTip": "E-Mail",
+        "constraints": {
+          "required": true
+        },
+        "visible": true
+      }]
+    }],
     "outputs": {
       "serverUsername": "[basics('serverUsername')]",
       "serverPassword": "[basics('serverPassword').password]",
+      "adminUsername": "[steps('relutionAdmin').adminUsername]",
+      "adminPassword": "[steps('relutionAdmin').adminPassword]",
+      "adminGivenname": "[steps('relutionAdmin').adminGivenname]",
+      "adminSurname": "[steps('relutionAdmin').adminSurname]",
+      "adminEmail": "[steps('relutionAdmin').adminEmail]",
       "location": "[location()]"
     }
   }
