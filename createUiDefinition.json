@@ -90,7 +90,7 @@
       "adminGivenname": "[basics('adminGivenname')]",
       "adminSurname": "[basics('adminSurname')]",
       "adminEmail": "[basics('adminEmail')]",
-      "adminPassword": "[location()]"
+      "location": "[location()]"
     }
   }
 }
