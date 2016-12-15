@@ -2,47 +2,94 @@
   "handler": "Microsoft.Compute.MultiVm",
   "version": "0.0.1-preview",
   "parameters": {
-    "basics": [
-      {
-        "name": "adminUsername",
-        "type": "Microsoft.Compute.UserNameTextBox",
-        "label": "User name",
-        "defaultValue": "",
-        "toolTip": "Specify a user for accessing the virtual machines within your cluster.",
-        "constraints": {
-          "required": true
-        },
-        "osPlatform": "Linux"
+    "basics": [{
+      "name": "serverUsername",
+      "type": "Microsoft.Compute.UserNameTextBox",
+      "label": "User name",
+      "toolTip": "Admin username for the virtual machines.",
+      "constraints": {
+        "required": true
       },
-      {
-        "name": "password",
-        "type": "Microsoft.Compute.CredentialsCombo",
-        "label": {
-          "authenticationType": "Authentication type",
-          "password": "Password",
-          "confirmPassword": "Confirm password",
-          "sshPublicKey": "SSH public key"
-        },
-        "toolTip": {
-          "authenticationType": "Choose Authentication type Password or PublicKey(SSH).",
-          "password": "Enter the password for the specified user name.",
-          "sshPublicKey": "Copy Public key into field."
-        },
-        "constraints": {
-          "required": true
-        },
-        "options": {
-          "hideConfirmation": false
-        },
-        "osPlatform": "Linux"
+      "osPlatform": "Linux"
+    }, {
+      "name": "serverPassword",
+      "type": "Microsoft.Compute.CredentialsCombo",
+      "label": {
+        "password": "Password",
+        "confirmPassword": "Confirm password"
+      },
+      "toolTip": {
+        "password": "Admin password for the virtual machines."
+      },
+      "constraints": {
+        "required": true
+      },
+      "options": {
+        "hideConfirmation": false
+      },
+      "osPlatform": "Linux"
+    }, {
+      "name": "adminUsername",
+      "type": "Microsoft.Common.TextBox",
+      "label": "Admin user name",
+      "defaultValue": "",
+      "toolTip": "Admin username for the Relution Account.",
+      "constraints": {
+        "required": true
       }
-    ],
+    }, {
+      "name": "adminPassword",
+      "type": "Microsoft.Compute.CredentialsCombo",
+      "label": {
+        "password": "Admin password",
+        "confirmPassword": "Confirm password"
+      },
+      "toolTip": {
+        "password": "Admin password for the Relution Account."
+      },
+      "constraints": {
+        "required": true
+      },
+      "options": {
+        "hideConfirmation": false
+      },
+      "osPlatform": "Linux"
+    }, {
+      "name": "adminGivenname",
+      "type": "Microsoft.Common.TextBox",
+      "label": "Admin first name",
+      "defaultValue": "",
+      "toolTip": "Given name",
+      "constraints": {
+        "required": true
+      }
+    }, {
+      "name": "adminSurname",
+      "type": "Microsoft.Common.TextBox",
+      "label": "Admin last name",
+      "defaultValue": "",
+      "toolTip": "Last name",
+      "constraints": {
+        "required": true
+      }
+    }, {
+      "name": "adminEmail",
+      "type": "Microsoft.Common.TextBox",
+      "label": "Relution Admin E-Mail",
+      "defaultValue": "",
+      "toolTip": "E-Mail",
+      "constraints": {
+        "required": true
+      }
+    }],
     "outputs": {
+      "serverUsername": "[basics('adminUsername')]",
+      "serverPassword": "[basics('adminPassword')]",
       "adminUsername": "[basics('adminUsername')]",
-      "authenticationType": "[basics('password').authenticationType]",
-      "adminPassword": "[basics('password').password]",
-      "sshPublicKey": "[basics('password').sshPublicKey]",
-      "location": "[location()]"
+      "adminGivenname": "[basics('adminGivenname')]",
+      "adminSurname": "[basics('adminSurname')]",
+      "adminEmail": "[basics('adminEmail')]",
+      "adminPassword": "[location()]"
     }
   }
 }
