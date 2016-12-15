@@ -348,7 +348,7 @@
     }, {
       "type": "firewallRules",
       "kind": "v12.0",
-      "name": "AllowAllWindowsAzureIps",
+      "name": "AllowAllIps",
       "apiVersion": "2014-04-01",
       "location": "[variables('location')]",
       "properties": {
