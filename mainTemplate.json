@@ -29,7 +29,7 @@
     "adminPassword": {
       "type": "securestring",
       "defaultValue": "$3cuRe4711"
-    },
+    }
   },
   "variables": {
     "apiVersion": "2015-06-15",
@@ -318,8 +318,7 @@
         }
       }]
     }
-  }, 
-  {
+  }, {
     "type": "Microsoft.Sql/servers",
     "kind": "v12.0",
     "name": "[variables('dbServerName')]",
