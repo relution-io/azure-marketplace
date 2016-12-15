@@ -83,9 +83,10 @@
       }
     }],
     "outputs": {
-      "serverUsername": "[basics('adminUsername')]",
-      "serverPassword": "[basics('adminPassword')]",
+      "serverUsername": "[basics('serverUsername')]",
+      "serverPassword": "[basics('serverPassword').password]",
       "adminUsername": "[basics('adminUsername')]",
+      "adminPassword": "[basics('adminPassword').password]",
       "adminGivenname": "[basics('adminGivenname')]",
       "adminSurname": "[basics('adminSurname')]",
       "adminEmail": "[basics('adminEmail')]",
