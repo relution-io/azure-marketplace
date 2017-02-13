@@ -13,25 +13,23 @@
       "osPlatform": "Linux",
       "visible": true
     }, {
-      "name": "serverPassword",
-      "type": "Microsoft.Compute.PasswordBox",
-      "label": {
-        "password": "Password",
-        "confirmPassword": "Confirm password"
-      },
-      "toolTip": {
-        "password": "Admin password for the virtual machines."
-      },
-      "constraints": {
-        "required": true
-      },
-      "options": {
-        "hideConfirmation": false,
-        "hidePassword": false
-      },
-      "osPlatform": "Linux",
-      "visible": true
-    }],
+        "name": "serverPassword",
+        "type": "Microsoft.Common.PasswordBox",
+        "label": {
+          "password": "Password",
+          "confirmPassword": "Confirm password"
+        },
+        "toolTip": "Admin password for the virtual machines.",
+        "constraints": {
+          "required": true,
+          "regex": "^[a-z0-9A-Z]{8,30}$",
+          "validationMessage": "Only alphanumeric characters are allowed, and the value must be 8-30 characters long."
+        },
+        "options": {
+          "hideConfirmation": false
+        },
+        "visible": true
+      }],
     "steps": [{
       "name": "relutionAdmin",
       "label": "Relution Account",
