@@ -23,7 +23,7 @@
 			"constraints": {
 				"required": true,
 				"regex": "(?=^.{8,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*",
-				"validationMessage": "Chosse a complex password with lowercase and uppercase characters, numbers and symbols."
+				"validationMessage": "Chosse a complex password with lowercase, uppercase characters, numbers and symbols. The value must be 12-60 characters long."
 			},
 			"options": {
 				"hideConfirmation": false
