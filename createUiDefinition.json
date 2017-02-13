@@ -14,17 +14,13 @@
       "visible": true
     }, {
       "name": "serverPassword",
-      "type": "Microsoft.Compute.CredentialsCombo",
+      "type": "Microsoft.Compute.PasswordBox",
       "label": {
-        "authenticationType": "Authentication Type",
         "password": "Password",
-        "confirmPassword": "Confirm password",
-        "sshPublicKey": "SSH public key"
+        "confirmPassword": "Confirm password"
       },
       "toolTip": {
-        "authenticationType": "",
-        "password": "Admin password for the virtual machines.",
-        "sshPublicKey": "SSH public key"
+        "password": "Admin password for the virtual machines."
       },
       "constraints": {
         "required": true
@@ -38,18 +34,18 @@
     }],
     "steps": [{
       "name": "relutionAdmin",
-      "label": "Relution Account credetials",
+      "label": "Relution Account",
       "subLabel": {
-        "preValidation": "Configure the reltuion admin",
+        "preValidation": "relution configuration",
         "postValidation": "Done"
       },
       "bladeTitle": "Relution Admin",
       "elements": [{
         "name": "adminUsername",
         "type": "Microsoft.Common.TextBox",
-        "label": "Admin user name",
+        "label": "User name",
         "defaultValue": "admin",
-        "toolTip": "Admin username for the Relution Account.",
+        "toolTip": "Username for the Relution admin account.",
         "constraints": {
           "required": true,
           "regex": "^[a-z0-9A-Z]{1,30}$",
@@ -60,10 +56,10 @@
         "name": "adminPassword",
         "type": "Microsoft.Common.PasswordBox",
         "label": {
-          "password": "Admin password",
+          "password": "Password",
           "confirmPassword": "Confirm password"
         },
-        "toolTip": "Admin password for the Relution Account.",
+        "toolTip": "Password for the Relution admin account.",
         "constraints": {
           "required": true,
           "regex": "^[a-z0-9A-Z]{8,30}$",
@@ -76,9 +72,9 @@
       }, {
         "name": "adminGivenname",
         "type": "Microsoft.Common.TextBox",
-        "label": "Admin first name",
+        "label": "First name",
         "defaultValue": "",
-        "toolTip": "Given name",
+        "toolTip": "Given name for the relution admin account.",
         "constraints": {
           "required": true
         },
@@ -86,9 +82,9 @@
       }, {
         "name": "adminSurname",
         "type": "Microsoft.Common.TextBox",
-        "label": "Admin last name",
+        "label": "Last name",
         "defaultValue": "",
-        "toolTip": "Last name",
+        "toolTip": "Last name for the relution admin account.",
         "constraints": {
           "required": true
         },
@@ -96,9 +92,9 @@
       }, {
         "name": "adminEmail",
         "type": "Microsoft.Common.TextBox",
-        "label": "Relution Admin E-Mail",
+        "label": "E-Mail",
         "defaultValue": "",
-        "toolTip": "E-Mail",
+        "toolTip": "E-Mail address for the relution admin account.",
         "constraints": {
           "required": true
         },
@@ -107,7 +103,7 @@
     }],
     "outputs": {
       "serverUsername": "[basics('serverUsername')]",
-      "serverPassword": "[basics('serverPassword').password]",
+      "serverPassword": "[basics('serverPassword')]",
       "adminUsername": "[steps('relutionAdmin').adminUsername]",
       "adminPassword": "[steps('relutionAdmin').adminPassword]",
       "adminGivenname": "[steps('relutionAdmin').adminGivenname]",
