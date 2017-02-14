@@ -53,7 +53,7 @@
 			"name": "relutionAdmin",
 			"label": "Relution Account",
 			"subLabel": {
-				"preValidation": "relution configuration",
+				"preValidation": "Configuration",
 				"postValidation": "Done"
 			},
 			"bladeTitle": "Relution Admin",
@@ -79,8 +79,8 @@
 				"toolTip": "Password for the Relution admin account.",
 				"constraints": {
 					"required": true,
-					"regex": "^[a-z0-9A-Z]{8,30}$",
-					"validationMessage": "Only alphanumeric characters are allowed, and the value must be 8-30 characters long."
+					"regex": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$",
+					"validationMessage": "Minimum 8 characters at least 1 Uppercase Alphabet, 1 Lowercase Alphabet and 1 Number are required."
 				},
 				"options": {
 					"hideConfirmation": false
@@ -119,14 +119,14 @@
 			}]
 		}],
 		"outputs": {
+            "location": "[location()]",
 			"serverUsername": "[basics('serverUsername')]",
 			"serverPassword": "[basics('serverPassword')]",
 			"adminUsername": "[steps('relutionAdmin').adminUsername]",
 			"adminPassword": "[steps('relutionAdmin').adminPassword]",
 			"adminGivenname": "[steps('relutionAdmin').adminGivenname]",
 			"adminSurname": "[steps('relutionAdmin').adminSurname]",
-			"adminEmail": "[steps('relutionAdmin').adminEmail]",
-			"location": "[location()]"
+			"adminEmail": "[steps('relutionAdmin').adminEmail]"
 		}
 	}
 }
