@@ -115,7 +115,7 @@
 			"s",
 			"y"
 		],
-		"wadProcessorMetricName": "\\Processor(_Total)\\% Processor Time",
+		"wadProcessorMetricName": "Percentage CPU",
 		"subnetnameapplicationserver": "appserver",
 		"loadBalancerNameapplicationserver": "[concat(variables('uniqueNamePrefix'),'LoadBalancer-applicationserver')]",
 		"publicIPAddressNameapplicationserver": "[concat(variables('uniqueNamePrefix'),'LoadBalancerIP-applicationserver')]",
@@ -252,7 +252,7 @@
 						"timeWindow": "PT5M",
 						"timeAggregation": "Average",
 						"operator": "GreaterThan",
-						"threshold": 800
+						"threshold": 80
 					},
 					"scaleAction": {
 						"direction": "Increase",
@@ -270,7 +270,7 @@
 						"timeWindow": "PT5M",
 						"timeAggregation": "Average",
 						"operator": "LessThan",
-						"threshold": 600
+						"threshold": 30
 					},
 					"scaleAction": {
 						"direction": "Decrease",
