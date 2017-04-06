@@ -100,15 +100,6 @@ echo ADMIN_GIVENNAME = "${ADMIN_GIVENNAME}"
 echo ADMIN_SURNAME   = "${ADMIN_SURNAME}"
 echo ADMIN_EMAIL     = "${ADMIN_EMAIL}"
 
-# permit root login and add default ssh keys
-sed -i 's/PermitRootLogin forced-commands-only/PermitRootLogin yes/g' /etc/ssh/sshd_config
-systemctl restart  sshd.service
-
-mkdir /root/.ssh
-cat > /root/.ssh/authorized_keys << "EOF"
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDRRhNDE2yOTQbDJQgtphL+BFYSTJEfA5/wXmYfiFClB0neuYyvZgiyRBLcyrnHN+Am34L1ne+4UklDLN7AqNDdJSnHXfBVN6sIw59bSHcNlgivNm1U4EHwJry/pBsknk3Q8JDMUTp9UjZTX2j44utF92YrAHa4rCBSTYbt0cxY1fOFrHsAuZEK+rJnuelmxmcpAoscSArdKKNe7HfgpPXZ90ZWQmeAk2LlMm9kQ9NY1lm2u/hV+rUgbWgDyMm2bsWMs3EZe8g2H5vgbCaCjnqbUXUs/3hehiPzzQKYTlZeCkRu5ro1FxMKow5AaPNZrr5B/6KveAAbCyvRIP4EmTj xxx@mwaysolutions.com
-EOF
-
 # aliases
 cat >> /root/.bashrc << "EOF"
 alias l='ls -lah'
