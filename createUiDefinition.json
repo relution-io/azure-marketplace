@@ -7,6 +7,7 @@
 				"name": "serverUsername",
 				"type": "Microsoft.Compute.UserNameTextBox",
 				"label": "User name",
+				"defaultValue": "centos",
 				"toolTip": "Admin username for the virtual machines.",
 				"constraints": {
 					"required": true
