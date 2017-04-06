@@ -16,24 +16,6 @@
 			},
 			{
 				"name": "serverPassword",
-				"type": "Microsoft.Common.PasswordBox",
-				"label": {
-					"password": "Password",
-					"confirmPassword": "Confirm password"
-				},
-				"toolTip": "Admin password for the virtual machines.",
-				"constraints": {
-					"required": true,
-					"regex": "(?=^.{8,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*",
-					"validationMessage": "Chosse a complex password with lowercase, uppercase characters, numbers and symbols. The value must be 12-60 characters long."
-				},
-				"options": {
-					"hideConfirmation": false
-				},
-				"visible": true
-			},
-			{
-				"name": "serverPassword",
 				"type": "Microsoft.Compute.CredentialsCombo",
 				"label": {
 					"authenticationType": "Authentication type",
@@ -47,7 +29,9 @@
 					"sshPublicKey": "Copy Public key into field."
 				},
 				"constraints": {
-					"required": true
+					"required": true,
+					"customPasswordRegex": "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$",
+    				"customValidationMessage": "The password must contain at least 8 characters, with at least 1 letter and 1 number."
 				},
 				"options": {
 					"hideConfirmation": false,
