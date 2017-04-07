@@ -1,6 +1,7 @@
 {
+	"$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
 	"handler": "Microsoft.Compute.MultiVm",
-	"version": "0.0.1-preview",
+	"version": "0.1.2-preview",
 	"parameters": {
 		"basics": [
 			{
@@ -32,7 +33,7 @@
 				"constraints": {
 					"required": true,
 					"customPasswordRegex": "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$",
-    				"customValidationMessage": "The password must contain at least 8 characters, with at least 1 letter and 1 number."
+					"customValidationMessage": "The password must contain at least 8 characters, with at least 1 letter and 1 number."
 				},
 				"options": {
 					"hideConfirmation": false,
@@ -122,9 +123,9 @@
 		"outputs": {
 			"location": "[location()]",
 			"serverUsername": "[basics('serverUsername')]",
-      		"serverPassword": "[basics('password').password]",
-			"serverAuthenticationType": "[basics('password').authenticationType]",
-      		"serverSshPublicKey": "[basics('password').sshPublicKey]",
+			"serverPassword": "[basics('serverPassword').password]",
+			"serverAuthenticationType": "[basics('serverPassword').authenticationType]",
+			"serverSshPublicKey": "[basics('serverPassword').sshPublicKey]",
 			"adminUsername": "[steps('relutionAdmin').adminUsername]",
 			"adminPassword": "[steps('relutionAdmin').adminPassword]",
 			"adminGivenname": "[steps('relutionAdmin').adminGivenname]",
