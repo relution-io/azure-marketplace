@@ -51,8 +51,7 @@
 			"defaultValue": "info@relution.io"
 		},
 		"adminPassword": {
-			"type": "securestring",
-			"defaultValue": "$3cuRe4711"
+			"type": "securestring"
 		},
 		"location": {
 			"type": "string",
@@ -73,10 +72,10 @@
 	"variables": {
 		"apiVersion": "2015-06-15",
 		"resourceGroupNameToLower": "[toLower(resourceGroup().name)]",
-		"dbServerName": "[concat(variables('resourceGroupNameToLower'), '-relution-db')]",
+		"dbServerName": "[concat(uniqueString(resourceGroup().id, deployment().name), '-relution-db')]",
 		"dbName": "relution",
 		"dbUsername": "relution",
-		"dbPassword": "[concat('R3lu10N',uniqueString(resourceGroup().id, deployment().name),'$23')]",
+		"dbPassword": "[concat('R3lu10N',uniqueString(resourceGroup().id, deployment().name, parameters('serverPassword')),'$23')]",
 		"computerNamePrefix": "[concat(variables('uniqueNamePrefix'),'-applicationserver')]",
 		"password_osProfile": {
 			"computerNamePrefix": "[concat(variables('uniqueNamePrefix'),'-applicationserver')]",
@@ -102,7 +101,6 @@
 		"OSDiskStorageAccountType": "Standard_LRS",
 		"dnsinfo": "YVkwY1NLdXJNaE55RkpSTDNOQUlrWW5OMVhZODVBbWdiaTRkanpYSAo=",
 		"virtualNetworkName": "[concat(variables('resourceGroupNameToLower'),'vnet')]",
-		"location": "[parameters('location')]",
 		"uniqueNamePrefix": "[concat(variables('resourceGroupNameToLower'),'-relution')]",
 		"appserversubnetname": "appserver",
 		"newAppServerSubnetAddressPrefix": "[concat('192.168.1.32/27')]",
@@ -132,7 +130,7 @@
 			"apiVersion": "[variables('apiVersion')]",
 			"type": "Microsoft.Network/virtualNetworks",
 			"name": "[variables('virtualNetworkName')]",
-			"location": "[variables('location')]",
+			"location": "[parameters('location')]",
 			"properties": {
 				"addressSpace": {
 					"addressPrefixes": [
@@ -153,7 +151,7 @@
 			"apiVersion": "[variables('apiVersion')]",
 			"type": "Microsoft.Network/networkSecurityGroups",
 			"name": "[variables('appNSGName')]",
-			"location": "[resourceGroup().location]",
+			"location": "[parameters('location')]",
 			"tags": {},
 			"properties": {
 				"securityRules": [
@@ -206,7 +204,7 @@
 			"type": "Microsoft.Network/virtualNetworks/subnets",
 			"apiVersion": "[variables('apiVersion')]",
 			"name": "[concat(variables('virtualNetworkName'), '/', variables('appserversubnetname'))]",
-			"location": "[resourceGroup().location]",
+			"location": "[parameters('location')]",
 			"properties": {
 				"addressPrefix": "[variables('newAppServerSubnetAddressPrefix')]",
 				"networkSecurityGroup": {
@@ -226,7 +224,7 @@
 				"name": "storageLoop",
 				"count": 5
 			},
-			"location": "[variables('location')]",
+			"location": "[parameters('location')]",
 			"properties": {
 				"accountType": "[variables('OSDiskStorageAccountType')]"
 			}
@@ -234,7 +232,7 @@
 		{
 			"name": "autoscalewad-applicationserver",
 			"type": "Microsoft.Insights/autoscaleSettings",
-			"location": "[variables('location')]",
+			"location": "[parameters('location')]",
 			"apiVersion": "2015-04-01",
 			"dependsOn": [
 				"[concat('Microsoft.Compute/virtualMachineScaleSets/', variables('uniqueNamePrefix'),'-applicationserver')]"
@@ -302,7 +300,7 @@
 			"apiVersion": "[variables('apiVersion')]",
 			"type": "Microsoft.Network/publicIPAddresses",
 			"name": "[concat(variables('publicIPAddressNameapplicationserver'))]",
-			"location": "[variables('location')]",
+			"location": "[parameters('location')]",
 			"properties": {
 				"publicIPAllocationMethod": "static",
 				"dnsSettings": {
@@ -314,7 +312,7 @@
 			"apiVersion": "[variables('apiVersion')]",
 			"name": "[variables('loadBalancerNameapplicationserver')]",
 			"type": "Microsoft.Network/loadBalancers",
-			"location": "[variables('location')]",
+			"location": "[parameters('location')]",
 			"dependsOn": [
 				"[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressNameapplicationserver'))]"
 			],
@@ -427,7 +425,7 @@
 					"type": "databases",
 					"name": "[variables('dbName')]",
 					"apiVersion": "2014-04-01",
-					"location": "[variables('location')]",
+					"location": "[parameters('location')]",
 					"properties": {
 						"edition": "Basic",
 						"collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -443,7 +441,7 @@
 					"kind": "v12.0",
 					"name": "AllowAllIps",
 					"apiVersion": "2014-04-01",
-					"location": "[variables('location')]",
+					"location": "[parameters('location')]",
 					"properties": {
 						"startIpAddress": "0.0.0.0",
 						"endIpAddress": "0.0.0.0"
@@ -458,7 +456,7 @@
 			"type": "Microsoft.Compute/virtualMachineScaleSets",
 			"apiVersion": "[variables('apiVersion')]",
 			"name": "[concat(variables('uniqueNamePrefix'),'-applicationserver')]",
-			"location": "[variables('location')]",
+			"location": "[parameters('location')]",
 			"dependsOn": [
 				"[concat('Microsoft.Storage/storageAccounts/a', variables('newStorageAccountSuffix'))]",
 				"[concat('Microsoft.Storage/storageAccounts/g', variables('newStorageAccountSuffix'))]",
@@ -543,7 +541,7 @@
 										]
 									},
 									"protectedSettings": {
-										"commandToExecute": "[concat('sh script.sh --dns_host ',variables('resourceGroupNameToLower'),' --dns_domain ',variables('location'),'.cloudapp.azure.com --db_type mssql --db_host ',variables('dbServerName'),'.database.windows.net --db_port 1433 --db_name ',variables('dbName'),' --db_user ',variables('dbUsername'),' --db_password ',variables('dbPassword'),' --admin_username ',parameters('adminUsername'),' --admin_password ',parameters('adminPassword'),' --admin_email ',parameters('adminEmail'),' --admin_givenname ',parameters('adminGivenname'),' --admin_surname ',parameters('adminSurname'),' -m QWdFajRJeGpyOHl4b2tRNFVVdkVFWlRYdlJNcVlkWXNYRVRqZTI5cnI4Y0I= -a QUtJQUlGVE5SV1NYNDJQWlVYSVEK -s ',variables('dnsinfo'))]"
+										"commandToExecute": "[concat('sh script.sh --dns_host ',variables('resourceGroupNameToLower'),' --dns_domain ',parameters('location'),'.cloudapp.azure.com --db_type mssql --db_host ',variables('dbServerName'),'.database.windows.net --db_port 1433 --db_name ',variables('dbName'),' --db_user ',variables('dbUsername'),' --db_password ',variables('dbPassword'),' --admin_username ',parameters('adminUsername'),' --admin_password ',parameters('adminPassword'),' --admin_email ',parameters('adminEmail'),' --admin_givenname ',parameters('adminGivenname'),' --admin_surname ',parameters('adminSurname'),' -m QWdFajRJeGpyOHl4b2tRNFVVdkVFWlRYdlJNcVlkWXNYRVRqZTI5cnI4Y0I= -a QUtJQUlGVE5SV1NYNDJQWlVYSVEK -s ',variables('dnsinfo'))]"
 									}
 								}
 							}

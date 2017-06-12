@@ -113,7 +113,9 @@
 						"defaultValue": "",
 						"toolTip": "E-Mail address for the relution admin account.",
 						"constraints": {
-							"required": true
+							"required": true,
+							"regex": "^([A-Za-z0-9!#$%&'*+\\-/=?^_`{|}~]+\\.?)*[A-Za-z0-9!#$%&'*+\\-/=?^_`{|}~]+@([A-Za-z0-9\\-]+\\.)*[A-Za-z0-9\\-]+$",
+							"validationMessage": "A valid email address is required."
 						},
 						"visible": true
 					}
