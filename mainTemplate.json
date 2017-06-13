@@ -413,7 +413,7 @@
 			"kind": "v12.0",
 			"name": "[variables('dbServerName')]",
 			"apiVersion": "2014-04-01",
-			"location": "[variables('location')]",
+			"location": "[parameters('location')]",
 			"properties": {
 				"administratorLogin": "[variables('dbUsername')]",
 				"administratorLoginPassword": "[variables('dbPassword')]",
